@@ -1,12 +1,15 @@
 package cmu.waci.logger;
 
 
+import java.util.LinkedList;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Binder;
 import android.os.IBinder;
+import android.text.format.Time;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
@@ -16,11 +19,12 @@ import android.widget.Toast;
 
 public class InteractivityService extends Service{
 	InteractivityView mView;
-
+	LinkedList<Time> mActs;
+	
 	public void onCreate() {
 		super.onCreate();
 		System.out.println("h");
-		
+		mActs =  new LinkedList<Time>();
 		mView = new InteractivityView(this);
 		
 		
@@ -32,9 +36,13 @@ public class InteractivityService extends Service{
 		
 		final GestureDetector gestureDetector = new GestureDetector(this, new InteractivityListener());
 		View.OnTouchListener gestureListener = new View.OnTouchListener() {
-		      public boolean onTouch(View v, MotionEvent event) {
-		    	  System.out.println("good1");
-		            return false;//gestureDetector.onTouchEvent(event);
+			public boolean onTouch(View v, MotionEvent event) {
+				Time t = new Time();
+				t.setToNow();
+				mActs.add(t);
+			//	System.out.println("good1");
+				System.out.println(mActs.size());
+				return false;//gestureDetector.onTouchEvent(event);
 		      }
 		};
 		
@@ -65,7 +73,7 @@ public class InteractivityService extends Service{
 	    @Override
 	    public boolean onTouchEvent(MotionEvent event) {
 	        //return super.onTouchEvent(event);
-	    	System.out.println("good2");
+	    //	System.out.println("good2");
 	    //    Toast.makeText(getContext(),"onTouchEvent", Toast.LENGTH_LONG).show();
 	        return false;
 	    }
