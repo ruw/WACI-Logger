@@ -1,6 +1,7 @@
 package cmu.waci.logger;
 
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import android.app.Notification;
@@ -10,6 +11,7 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.text.format.Time;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
@@ -21,13 +23,17 @@ import android.widget.Toast;
 public class InteractivityService extends Service{
 	InteractivityView mView;
 	LinkedList<Time> mActs;
+	private DVFSControl dvfs;
 	
 	public void onCreate() {
 		super.onCreate();
 		System.out.println("h");
 		mActs =  new LinkedList<Time>();
 		mView = new InteractivityView(this);
+		dvfs  =  new  DVFSControl();
 		
+		Notification n = new Notification();
+		startForeground(1111, n);
 		
 		WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
@@ -43,7 +49,7 @@ public class InteractivityService extends Service{
 				Time t = new Time();
 				t.setToNow();
 				mActs.add(t);
-				//System.out.println("good1");
+				System.out.println("good1");
 				//System.out.println(mActs.size());
 				
 				long m = mActs.getFirst().toMillis(false);
@@ -68,12 +74,30 @@ public class InteractivityService extends Service{
 	Runnable doWork = new Runnable() {
 		public void run(){
 			System.out.println("wat");
-			
-			Notification n = new Notification();
-			startForeground(1337, n);
-		
+			ArrayList<Integer> freqModes = dvfs.getFrequencyScaleModes();
+		/*	
+			for(int i =0; i<120;i++) {
+				if(mActs.size() < 2)
+					dvfs.setCPUFrequency(freqModes.get(0));
+				else if(mActs.size() < 10)
+					dvfs.setCPUFrequency(freqModes.get(1));
+				SystemClock.sleep(5000);
+			}*/
 		}
 	};
+	
+	private void removeOld(long age) {
+		Time t = new Time();
+		t.setToNow();
+		long cur = t.toMillis(false);
+		while(mActs.peek() != null) {
+			if(mActs.peek().toMillis(false)+age < cur) {
+				mActs.remove();
+			}
+		}
+		
+			
+	}
     
     
 	class InteractivityView extends View {
