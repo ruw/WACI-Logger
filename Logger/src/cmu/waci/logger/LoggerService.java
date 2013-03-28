@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -53,8 +54,10 @@ public class LoggerService extends Service{
  //   private SensorInfo mSensorInfo;
     private CPUInfo mCpuInfo;
     private List<Sensor> sensAcc;
-	
     
+    private DVFSControl dvfs;
+	
+    public static DVFSControl DVFSController;
     
     
     public void onCreate() {
@@ -69,6 +72,7 @@ public class LoggerService extends Service{
         audMan = (AudioManager) getSystemService(AUDIO_SERVICE);
         sensMan = (SensorManager) getSystemService(SENSOR_SERVICE);
         audMan = (AudioManager) getSystemService(AUDIO_SERVICE);
+        DVFSController  =  dvfs;
         
    //     sigStrength = new SignalStrength();
         
@@ -120,8 +124,8 @@ public class LoggerService extends Service{
             	LoggerService.this.stopSelf();
             }
                     
-            
-            for(int i=0; i<2;i++) {
+        	dvfs  =  new  DVFSControl();
+            for(int i=0; i<10;i++) {
             
 	            try{
 	            	String outputString = "";
@@ -160,6 +164,14 @@ public class LoggerService extends Service{
 	                sensAcc = sensMan.getSensorList(Sensor.TYPE_ACCELEROMETER);
 	                //System.out.println("Acc "+sensAcc.values[0]+","+sensAcc.values[1]+","+sensAcc.values[2]);
 	                
+	                int curr;
+	                dvfs.setCPUFrequency(1200000);
+	                curr = dvfs.getCPUFrequency();
+	                
+	                //ArrayList<Integer> freqModes = DVFSControl.getFrequencyScaleModes();
+	                System.out.println("CPU Freq: " + curr);
+	                
+	                
 	                
 	                //TODO figure out API calls for network sig strength
 	                // Get network data signal strengths
@@ -183,7 +195,7 @@ public class LoggerService extends Service{
 	               
 	                
 	                out.write(outputString);
-	                //SystemClock.sleep(2000);
+	                SystemClock.sleep(500);
 	
 	            } catch (IOException e) {
 	                Log.e(TAG, "Exception appending to log file",e);
