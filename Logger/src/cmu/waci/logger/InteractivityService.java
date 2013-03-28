@@ -3,6 +3,7 @@ package cmu.waci.logger;
 
 import java.util.LinkedList;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -34,14 +35,22 @@ public class InteractivityService extends Service{
                 PixelFormat.TRANSLUCENT);
 		
 		
+
+		
 		final GestureDetector gestureDetector = new GestureDetector(this, new InteractivityListener());
 		View.OnTouchListener gestureListener = new View.OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent event) {
 				Time t = new Time();
 				t.setToNow();
 				mActs.add(t);
-			//	System.out.println("good1");
-				System.out.println(mActs.size());
+				//System.out.println("good1");
+				//System.out.println(mActs.size());
+				
+				long m = mActs.getFirst().toMillis(false);
+				long cur = t.toMillis(true);
+				//System.out.println("true: " + t.toMillis(true) + " false: " + t.toMillis(false));
+				//System.out.println(cur-m);
+				
 				return false;//gestureDetector.onTouchEvent(event);
 		      }
 		};
@@ -59,6 +68,9 @@ public class InteractivityService extends Service{
 	Runnable doWork = new Runnable() {
 		public void run(){
 			System.out.println("wat");
+			
+			Notification n = new Notification();
+			startForeground(1337, n);
 		
 		}
 	};
