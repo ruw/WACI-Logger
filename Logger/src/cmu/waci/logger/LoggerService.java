@@ -57,7 +57,7 @@ public class LoggerService extends Service{
     
     private DVFSControl dvfs;
 	
-    public static DVFSControl DVFSController;
+    //public static DVFSControl DVFSController;
     
     
     public void onCreate() {
@@ -72,8 +72,9 @@ public class LoggerService extends Service{
         audMan = (AudioManager) getSystemService(AUDIO_SERVICE);
         sensMan = (SensorManager) getSystemService(SENSOR_SERVICE);
         audMan = (AudioManager) getSystemService(AUDIO_SERVICE);
-        DVFSController  =  dvfs;
-        
+       
+        //DVFSController  =  dvfs;
+        dvfs  =  new  DVFSControl();
    //     sigStrength = new SignalStrength();
         
         mNetInfo = new NetInfo(wifiMan, connMan, telMan);
@@ -124,7 +125,8 @@ public class LoggerService extends Service{
             	LoggerService.this.stopSelf();
             }
                     
-        	dvfs  =  new  DVFSControl();
+        	
+          
             for(int i=0; i<10;i++) {
             
 	            try{
@@ -165,13 +167,14 @@ public class LoggerService extends Service{
 	                //System.out.println("Acc "+sensAcc.values[0]+","+sensAcc.values[1]+","+sensAcc.values[2]);
 	                
 	                int curr;
-	                dvfs.setCPUFrequency(1200000);
 	                curr = dvfs.getCPUFrequency();
 	                
-	                //ArrayList<Integer> freqModes = DVFSControl.getFrequencyScaleModes();
+	                /*
 	                System.out.println("CPU Freq: " + curr);
-	                
-	                
+	                System.out.println("Try Step Down");
+	            	dvfs.stepDownFrequency();
+	                System.out.println("Done Step Down"); 
+	                */
 	                
 	                //TODO figure out API calls for network sig strength
 	                // Get network data signal strengths

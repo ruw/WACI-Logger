@@ -278,8 +278,12 @@ public class DVFSControl {
 	}
 
 	public boolean stepDownFrequency() {
+		System.out.println("Getting Curr Freq");
+		System.out.println("Curr Freq: "+getCPUFrequency());
 		int idx = indexOfFrequency(getCPUFrequency());
+		System.out.println("Index of curr: "+idx);
 		if (getCPUFrequency() > minFreq && idx > 0) {
+			System.out.println("Step Down: "+freqModes.get(idx - 1));
 			return setCPUFrequency(freqModes.get(idx - 1));
 		}
 		return false;
