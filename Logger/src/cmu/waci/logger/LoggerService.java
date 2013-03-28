@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.List;
 
 import android.app.ActivityManager;
 import android.app.ApplicationErrorReport.BatteryInfo;
@@ -14,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.LocationManager;
 import android.media.AudioManager;
@@ -50,6 +52,7 @@ public class LoggerService extends Service{
     private SignalStrength sigStrength;
  //   private SensorInfo mSensorInfo;
     private CPUInfo mCpuInfo;
+    private List<Sensor> sensAcc;
 	
     
     
@@ -118,7 +121,7 @@ public class LoggerService extends Service{
             }
                     
             
-            for(int i=0; i<60;i++) {
+            for(int i=0; i<2;i++) {
             
 	            try{
 	            	String outputString = "";
@@ -153,6 +156,10 @@ public class LoggerService extends Service{
 	
 	                float batteryPct = level / (float)scale;
 	               
+	                //TODO Accelerometer
+	                sensAcc = sensMan.getSensorList(Sensor.TYPE_ACCELEROMETER);
+	                //System.out.println("Acc "+sensAcc.values[0]+","+sensAcc.values[1]+","+sensAcc.values[2]);
+	                
 	                
 	                //TODO figure out API calls for network sig strength
 	                // Get network data signal strengths
@@ -176,7 +183,7 @@ public class LoggerService extends Service{
 	               
 	                
 	                out.write(outputString);
-	                SystemClock.sleep(2000);
+	                //SystemClock.sleep(2000);
 	
 	            } catch (IOException e) {
 	                Log.e(TAG, "Exception appending to log file",e);

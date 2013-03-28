@@ -2,6 +2,7 @@ package cmu.waci.logger;
 
 import java.util.Arrays;
 
+import cmu.waci.logger.InteractivityService.InteractBinder;
 import cmu.waci.logger.LoggerService.LocalBinder;
 
 import android.os.Binder;
@@ -19,7 +20,8 @@ public class LoggerActivity extends Activity {
 	private static final String TAG = "LoggerActivity";
 	
 	private LoggerService mLogger;
-	private boolean mBound;
+	private InteractivityService mInteract;
+	private boolean mBound, mBound2;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,7 @@ public class LoggerActivity extends Activity {
   //      mLogger.bindService(new Intent(this, 
   //              LoggerService.class), mConnection, Context.BIND_AUTO_CREATE);
         Intent intent = new Intent(this, LoggerService.class);
+        Intent intent2 = new Intent(this,  InteractivityService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -62,6 +65,11 @@ public class LoggerActivity extends Activity {
             unbindService(mConnection);
             mBound = false;
         }
+        
+        if (mBound2) {
+            unbindService(mConnection2);
+            mBound2 = false;
+        }
     }
 
 
@@ -80,6 +88,24 @@ public class LoggerActivity extends Activity {
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
             mBound = false;
+        }
+    };
+    
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection2 = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            InteractBinder binder = (InteractBinder) service;
+            mInteract = binder.getService();
+            mBound2 = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound2 = false;
         }
     };
 }
