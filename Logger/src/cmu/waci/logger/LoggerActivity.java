@@ -36,11 +36,7 @@ public class LoggerActivity extends Activity {
   //              LoggerService.class), mConnection, Context.BIND_AUTO_CREATE);
         Intent intent = new Intent(this, LoggerService.class);
         Intent intent2 = new Intent(this,  InteractivityService.class);
-<<<<<<< HEAD
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-=======
-        bindService(intent2, mConnection2, Context.BIND_AUTO_CREATE);
->>>>>>> c8ad81d8482b0700e22fa439a3fd692c05ac5405
     }
 
 
