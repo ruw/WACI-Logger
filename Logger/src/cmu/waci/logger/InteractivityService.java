@@ -49,7 +49,7 @@ public class InteractivityService extends Service{
 				Time t = new Time();
 				t.setToNow();
 				mActs.add(t);
-				System.out.println("good1");
+				//System.out.println("good1");
 				//System.out.println(mActs.size());
 				
 				long m = mActs.getFirst().toMillis(false);
@@ -71,18 +71,30 @@ public class InteractivityService extends Service{
 		
 	}
 	
+	
 	Runnable doWork = new Runnable() {
 		public void run(){
 			System.out.println("wat");
 			ArrayList<Integer> freqModes = dvfs.getFrequencyScaleModes();
-		/*	
+		
 			for(int i =0; i<120;i++) {
+				removeOld(30000);
 				if(mActs.size() < 2)
 					dvfs.setCPUFrequency(freqModes.get(0));
 				else if(mActs.size() < 10)
 					dvfs.setCPUFrequency(freqModes.get(1));
+				else if(mActs.size() < 15)
+					dvfs.setCPUFrequency(freqModes.get(2));
+				else if(mActs.size() < 20)
+					dvfs.setCPUFrequency(freqModes.get(4));
+				else if(mActs.size() < 30)
+					dvfs.setCPUFrequency(freqModes.get(6));
+				else
+					dvfs.setCPUFrequency(freqModes.get(10));
+			//	System.out.println("freq: " + dvfs.getCPUFrequency() + " presses: " + mActs.size());
 				SystemClock.sleep(5000);
-			}*/
+			}
+			InteractivityService.this.stopSelf();
 		}
 	};
 	
@@ -91,8 +103,12 @@ public class InteractivityService extends Service{
 		t.setToNow();
 		long cur = t.toMillis(false);
 		while(mActs.peek() != null) {
+		//	System.out.println("cur: " + cur + " old: " + mActs.peek().toMillis(false));
 			if(mActs.peek().toMillis(false)+age < cur) {
 				mActs.remove();
+			}
+			else {
+				break;
 			}
 		}
 		

@@ -107,14 +107,13 @@ public class LoggerService extends Service{
         	    mExternalStorageAvailable = mExternalStorageWriteable = false;
         	}
         	System.out.println("wat2");
-
         	//can't open a file, abort
         	if(!(mExternalStorageAvailable && mExternalStorageWriteable)) {
         		Log.e(TAG, "Could not get external storage");
         		LoggerService.this.stopSelf();
         	}
         	System.out.println(getExternalFilesDir(null));
-        	File log = new File(getExternalFilesDir(null), "log3.txt");
+        	File log = new File(getExternalFilesDir(null), "log6.txt");
             
         	BufferedWriter out = null;
         	try {
@@ -127,13 +126,13 @@ public class LoggerService extends Service{
                     
         	
           
-            for(int i=0; i<10;i++) {
+            for(int i=0; i<120;i++) {
             
 	            try{
 	            	String outputString = "";
-	            	System.out.println("logging: "+ i);
+	            	//System.out.println("logging: "+ i);
 	                
-	                
+	                /*
 	                //check the brightness
 	                int curBrightness;
 	            	curBrightness = android.provider.Settings.System.getInt(
@@ -165,7 +164,7 @@ public class LoggerService extends Service{
 	                //TODO Accelerometer
 	                sensAcc = sensMan.getSensorList(Sensor.TYPE_ACCELEROMETER);
 	                //System.out.println("Acc "+sensAcc.values[0]+","+sensAcc.values[1]+","+sensAcc.values[2]);
-	                
+	                */
 	                int curr;
 	                curr = dvfs.getCPUFrequency();
 	                
@@ -183,7 +182,7 @@ public class LoggerService extends Service{
 	                        mNetInfo.getEvdoSigStrength(),
 	                        mNetInfo.getGsmSigStrength()));
 	             */   
-	                outputString = outputString.concat(
+	             /*   outputString = outputString.concat(
 	                        String.format(",%s,%f,%d,%d,%d,%d,%d,%d,%d\n",
 	                        mNetInfo.getCallStatus(),  batteryPct,
 	                        batStat,
@@ -191,21 +190,25 @@ public class LoggerService extends Service{
 	                        CPUInfo.getContextSwitches(),
 	                        CPUInfo.getProcessesCreated(),
 	                        CPUInfo.getProcessesRunning(),
-	                        CPUInfo.getProcessesBlocked(), powMan.isScreenOn() ? 1 : 0));
+	                        CPUInfo.getProcessesBlocked(), powMan.isScreenOn() ? 1 : 0));*/
 	                  //      mMoving ? 1 : 0)); TODO figure out accelerometer and put this back in
 	                
 	                //TODO ambient light
-	               
+	               outputString = 
+	            		   String.format("%d,%d\n",
+	            		   CPUInfo.getCPUUtilizationPct(),
+	            		   dvfs.getCPUFrequency());
+	            		 
 	                
 	                out.write(outputString);
 	                SystemClock.sleep(500);
 	
 	            } catch (IOException e) {
 	                Log.e(TAG, "Exception appending to log file",e);
-	            } catch (SettingNotFoundException e) {
+	           } /*catch (SettingNotFoundException e) {
 	               // e.printStackTrace();
 	            	Log.e(TAG, "Brightness setting not found");
-	            }
+	            }*/
             }
             
             try {
@@ -214,7 +217,7 @@ public class LoggerService extends Service{
             } catch(IOException e) {
             	
             }
-            
+            System.out.println("done");
             LoggerService.this.stopSelf();
         }
     };
