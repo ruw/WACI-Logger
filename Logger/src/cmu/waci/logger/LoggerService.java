@@ -230,13 +230,17 @@ public class LoggerService extends Service{
 	                
 	                //TODO ambient light
 	               outputString = 
-	            		   String.format("%d,%d,%d,%d,%f,%f\n",
+	            		   String.format("%d,%d,%d,%d,%f,%f,%d,%d,%d\n",
 	            		   CPUInfo.getCPUUtilizationPct(),
 	            		   dvfs.getCPUFrequency(),
 	            		   InteractivityService.mActs.size(),
 	            		   CurrentReaderFactory.getValue()*-1,
 	            		   batteryPct,
-	            		   currentVoltage);
+	            		   currentVoltage,
+	            		   CPUInfo.getContextSwitches(),
+	                       CPUInfo.getProcessesCreated(),
+	                       CPUInfo.getProcessesRunning(),
+	                       CPUInfo.getProcessesBlocked(), powMan.isScreenOn() ? 1 : 0);
 	            		 
 	                
 	                mOut.write(outputString);
