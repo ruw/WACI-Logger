@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import com.manor.currentwidget.library.CurrentReaderFactory;
@@ -65,6 +66,7 @@ public class LoggerService extends Service{
     
     private BufferedWriter mOut;
     private boolean mRunning;
+    Date date;
 	
     //public static DVFSControl DVFSController;
     
@@ -87,6 +89,8 @@ public class LoggerService extends Service{
         dvfs  =  new  DVFSControl();
    //     sigStrength = new SignalStrength();
         mRunning = true;
+        
+        date = new Date();
         
         mNetInfo = new NetInfo(wifiMan, connMan, telMan);
         Toast.makeText(this, "poop ",1).show();
@@ -154,6 +158,7 @@ public class LoggerService extends Service{
         	try {
             	mOut = new BufferedWriter(
             			new FileWriter(log.getAbsolutePath(), log.exists()));
+            	mOut.write(date.toString()+"\n");
             } catch(IOException e) {
             	Log.e(TAG, "Exception opening log file",e);
             	LoggerService.this.stopSelf();
