@@ -67,10 +67,10 @@ public class LoggerActivity extends Activity {
         
         if (on) {
             // Enable CPU scaling
-        	//savePowerOn = true;
+        	InteractivityService.savePowerOn = true;
         } else {
             // Disable CPU scaling
-        	//savePowerOn = false;
+        	InteractivityService.savePowerOn = false;
         }
     }
 

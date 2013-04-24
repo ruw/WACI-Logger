@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.ApplicationErrorReport.BatteryInfo;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
@@ -25,6 +27,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -35,6 +38,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
+//@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class LoggerService extends Service{
 	private static final String TAG = "LoggerService";
 
@@ -56,11 +60,15 @@ public class LoggerService extends Service{
     private List<Sensor> sensAcc;
     
     private DVFSControl dvfs;
+    
+    private BufferedWriter mOut;
+    private boolean mRunning;
 	
     //public static DVFSControl DVFSController;
     
     
-    public void onCreate() {
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+	public void onCreate() {
     	notMan = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     	wifiMan = (WifiManager) getSystemService(WIFI_SERVICE);
     	connMan = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
@@ -76,10 +84,19 @@ public class LoggerService extends Service{
         //DVFSController  =  dvfs;
         dvfs  =  new  DVFSControl();
    //     sigStrength = new SignalStrength();
+        mRunning = true;
         
         mNetInfo = new NetInfo(wifiMan, connMan, telMan);
         Toast.makeText(this, "poop ",1).show();
         System.out.println("ppop");
+        
+        
+
+        
+        
+        
+        
+        
         Thread thr = new Thread(null, doWork, "Logger service");
         thr.start();
     }
@@ -88,11 +105,25 @@ public class LoggerService extends Service{
      * The function that runs in our worker thread
      */
     Runnable doWork = new Runnable() {
-        public void run() {
+        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+		public void run() {
+        	
+            //notification and set foreground
+            @SuppressWarnings("deprecation")
+			Notification note=new Notification.Builder(getApplicationContext())
+            		.setContentTitle("Logging")
+            		.setSmallIcon(R.drawable.ic_launcher)
+                    .getNotification();
+            
+            startForeground(1337, note);
+        	
+        	
+        	
         	boolean mExternalStorageAvailable = false;
         	boolean mExternalStorageWriteable = false;
         	String state = Environment.getExternalStorageState();
         	System.out.println("wat");
+        	
 
         	if (Environment.MEDIA_MOUNTED.equals(state)) {
         	    // We can read and write the media
@@ -113,11 +144,13 @@ public class LoggerService extends Service{
         		LoggerService.this.stopSelf();
         	}
         	System.out.println(getExternalFilesDir(null));
-        	File log = new File(getExternalFilesDir(null), "log6.txt");
+        	File log = new File(getExternalFilesDir(null), "log.txt");
+            log.delete();
+            log = new File(getExternalFilesDir(null), "log.txt");
             
-        	BufferedWriter out = null;
+        	mOut = null;
         	try {
-            	out = new BufferedWriter(
+            	mOut = new BufferedWriter(
             			new FileWriter(log.getAbsolutePath(), log.exists()));
             } catch(IOException e) {
             	Log.e(TAG, "Exception opening log file",e);
@@ -126,7 +159,7 @@ public class LoggerService extends Service{
                     
         	
           
-            for(int i=0; i<120;i++) {
+            while(mRunning) {
             
 	            try{
 	            	String outputString = "";
@@ -195,12 +228,13 @@ public class LoggerService extends Service{
 	                
 	                //TODO ambient light
 	               outputString = 
-	            		   String.format("%d,%d\n",
+	            		   String.format("%d,%d,%d\n",
 	            		   CPUInfo.getCPUUtilizationPct(),
-	            		   dvfs.getCPUFrequency());
+	            		   dvfs.getCPUFrequency(),
+	            		   InteractivityService.mActs.size());
 	            		 
 	                
-	                out.write(outputString);
+	                mOut.write(outputString);
 	                SystemClock.sleep(500);
 	
 	            } catch (IOException e) {
@@ -213,16 +247,28 @@ public class LoggerService extends Service{
             
             try {
             	
-            	out.close();
+            	mOut.close();
             } catch(IOException e) {
             	
             }
             System.out.println("done");
+            stopForeground(true);
             LoggerService.this.stopSelf();
         }
     };
     
-    
+    public void onDestroy() {
+    	
+    	mRunning = false;
+    /*	try {
+			mOut.close();
+		} catch (IOException e) {
+
+		}
+
+    	stopForeground(true);
+    	*/
+    }
     
     @Override
 	public IBinder onBind(Intent intent) {

@@ -3,12 +3,14 @@ package cmu.waci.logger;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.text.format.Time;
@@ -22,9 +24,10 @@ import android.widget.ToggleButton;
 
 public class InteractivityService extends Service {
 	InteractivityView mView;
-	LinkedList<Time> mActs;
+	static LinkedList<Time> mActs;
 	private DVFSControl dvfs;
-	private boolean savePowerOn = true;
+	static boolean savePowerOn = false;
+	private boolean mRunning;
 	
 	public void onCreate() {
 		super.onCreate();
@@ -33,6 +36,8 @@ public class InteractivityService extends Service {
 		mView = new InteractivityView(this);
 		dvfs = new DVFSControl();
 
+		mRunning = true;
+		
 		Notification n = new Notification();
 		startForeground(1111, n);
 
@@ -89,13 +94,24 @@ public class InteractivityService extends Service {
     }
 */
 	Runnable doWork = new Runnable() {
+		@SuppressWarnings("deprecation")
+		@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 		public void run() {
+            Notification note=new Notification.Builder(getApplicationContext())
+    		.setContentTitle("Optimizing")
+    		.setSmallIcon(R.drawable.ic_launcher)
+            .getNotification();
+    
+            startForeground(1338, note);
+			
+			
 			System.out.println("wat");
 			ArrayList<Integer> freqModes = dvfs.getFrequencyScaleModes();
 
-			if (savePowerOn) {
-				for (int i = 0; i < 120; i++) {
-					removeOld(30000);
+			
+			while (mRunning) {
+				removeOld(30000);
+				if (savePowerOn) {
 					if (mActs.size() < 2)
 						dvfs.setCPUFrequency(freqModes.get(0));
 					else if (mActs.size() < 10)
@@ -110,13 +126,16 @@ public class InteractivityService extends Service {
 						dvfs.setCPUFrequency(freqModes.get(10));
 					// System.out.println("freq: " + dvfs.getCPUFrequency() +
 					// " presses: " + mActs.size());
-					SystemClock.sleep(5000);
 				}
-			} else {
+				SystemClock.sleep(5000);
 			}
+
+			stopForeground(true);
+			mActs = null;
 			InteractivityService.this.stopSelf();
 		}
 	};
+	
 
 	private void removeOld(long age) {
 		Time t = new Time();
@@ -134,6 +153,10 @@ public class InteractivityService extends Service {
 
 	}
 
+	public void onDestroy() {
+		mRunning = false;
+	}
+	
 	class InteractivityView extends View {
 
 		public InteractivityView(Context context) {
