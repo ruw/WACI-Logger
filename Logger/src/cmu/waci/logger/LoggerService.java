@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import com.manor.currentwidget.library.CurrentReaderFactory;
+
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.ApplicationErrorReport.BatteryInfo;
@@ -176,10 +178,10 @@ public class LoggerService extends Service{
 	            			String.format("%d", curBrightness));
 	            	
 	                //Get battery data
-	                IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+	        */        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 	                Intent batteryStatus = registerReceiver(null, ifilter);
 	                
-	                
+	          /*      
 	             // Are we charging / charged?
 	                int batStat = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
 	                boolean isCharging = batStat == BatteryManager.BATTERY_STATUS_CHARGING ||
@@ -187,13 +189,13 @@ public class LoggerService extends Service{
 	
 	                // How are we charging?
 	                int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-	          //      boolean usbCharge = chargePlug == BATTERY_PLUGGED_USB;
+	         */ //      boolean usbCharge = chargePlug == BATTERY_PLUGGED_USB;
 	          //     boolean acCharge = chargePlug == BATTERY_PLUGGED_AC;
 	                int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
 	                int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-	
+	                float currentVoltage = (float)batteryStatus.getIntExtra("voltage", 0) / 1000;
 	                float batteryPct = level / (float)scale;
-	               
+	           /*    
 	                //TODO Accelerometer
 	                sensAcc = sensMan.getSensorList(Sensor.TYPE_ACCELEROMETER);
 	                //System.out.println("Acc "+sensAcc.values[0]+","+sensAcc.values[1]+","+sensAcc.values[2]);
@@ -228,10 +230,13 @@ public class LoggerService extends Service{
 	                
 	                //TODO ambient light
 	               outputString = 
-	            		   String.format("%d,%d,%d\n",
+	            		   String.format("%d,%d,%d,%d,%f,%f\n",
 	            		   CPUInfo.getCPUUtilizationPct(),
 	            		   dvfs.getCPUFrequency(),
-	            		   InteractivityService.mActs.size());
+	            		   InteractivityService.mActs.size(),
+	            		   CurrentReaderFactory.getValue()*-1,
+	            		   batteryPct,
+	            		   currentVoltage);
 	            		 
 	                
 	                mOut.write(outputString);
