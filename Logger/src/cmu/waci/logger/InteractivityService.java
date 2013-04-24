@@ -1,6 +1,5 @@
 package cmu.waci.logger;
 
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -19,142 +18,160 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
-public class InteractivityService extends Service{
+public class InteractivityService extends Service {
 	InteractivityView mView;
 	LinkedList<Time> mActs;
 	private DVFSControl dvfs;
+	private boolean savePowerOn = true;
 	
 	public void onCreate() {
 		super.onCreate();
 		System.out.println("h");
-		mActs =  new LinkedList<Time>();
+		mActs = new LinkedList<Time>();
 		mView = new InteractivityView(this);
-		dvfs  =  new  DVFSControl();
-		
+		dvfs = new DVFSControl();
+
 		Notification n = new Notification();
 		startForeground(1111, n);
-		
-		WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL|WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH|WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                PixelFormat.TRANSLUCENT);
-		
-		
 
-		
-		final GestureDetector gestureDetector = new GestureDetector(this, new InteractivityListener());
+		WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+				WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
+				WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+						| WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+						| WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
+						| WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+				PixelFormat.TRANSLUCENT);
+
+		final GestureDetector gestureDetector = new GestureDetector(this,
+				new InteractivityListener());
 		View.OnTouchListener gestureListener = new View.OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent event) {
 				Time t = new Time();
 				t.setToNow();
 				mActs.add(t);
-				//System.out.println("good1");
-				//System.out.println(mActs.size());
-				
+				// System.out.println("good1");
+				// System.out.println(mActs.size());
+
 				long m = mActs.getFirst().toMillis(false);
 				long cur = t.toMillis(true);
-				//System.out.println("true: " + t.toMillis(true) + " false: " + t.toMillis(false));
-				//System.out.println(cur-m);
-				
-				return false;//gestureDetector.onTouchEvent(event);
-		      }
+				// System.out.println("true: " + t.toMillis(true) + " false: " +
+				// t.toMillis(false));
+				// System.out.println(cur-m);
+
+				return false;// gestureDetector.onTouchEvent(event);
+			}
 		};
-		
+
 		WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-		
+
 		mView.setOnTouchListener(gestureListener);
 		wm.addView(mView, params);
-		
-        Thread thr = new Thread(null, doWork, "Interactivity");
-        thr.start();
-		
+
+		Thread thr = new Thread(null, doWork, "Interactivity");
+		thr.start();
+
 	}
 	
-	
+	/*
+    public void onToggleClicked(View view) {
+        // Is the toggle on?
+        boolean on = ((ToggleButton) view).isChecked();
+        
+        if (on) {
+            // Enable CPU scaling
+        	savePowerOn = true;
+        } else {
+            // Disable CPU scaling
+        	savePowerOn = false;
+        }
+    }
+*/
 	Runnable doWork = new Runnable() {
-		public void run(){
+		public void run() {
 			System.out.println("wat");
 			ArrayList<Integer> freqModes = dvfs.getFrequencyScaleModes();
-		
-			for(int i =0; i<120;i++) {
-				removeOld(30000);
-				if(mActs.size() < 2)
-					dvfs.setCPUFrequency(freqModes.get(0));
-				else if(mActs.size() < 10)
-					dvfs.setCPUFrequency(freqModes.get(1));
-				else if(mActs.size() < 15)
-					dvfs.setCPUFrequency(freqModes.get(2));
-				else if(mActs.size() < 20)
-					dvfs.setCPUFrequency(freqModes.get(4));
-				else if(mActs.size() < 30)
-					dvfs.setCPUFrequency(freqModes.get(6));
-				else
-					dvfs.setCPUFrequency(freqModes.get(10));
-			//	System.out.println("freq: " + dvfs.getCPUFrequency() + " presses: " + mActs.size());
-				SystemClock.sleep(5000);
+
+			if (savePowerOn) {
+				for (int i = 0; i < 120; i++) {
+					removeOld(30000);
+					if (mActs.size() < 2)
+						dvfs.setCPUFrequency(freqModes.get(0));
+					else if (mActs.size() < 10)
+						dvfs.setCPUFrequency(freqModes.get(1));
+					else if (mActs.size() < 15)
+						dvfs.setCPUFrequency(freqModes.get(2));
+					else if (mActs.size() < 20)
+						dvfs.setCPUFrequency(freqModes.get(4));
+					else if (mActs.size() < 30)
+						dvfs.setCPUFrequency(freqModes.get(6));
+					else
+						dvfs.setCPUFrequency(freqModes.get(10));
+					// System.out.println("freq: " + dvfs.getCPUFrequency() +
+					// " presses: " + mActs.size());
+					SystemClock.sleep(5000);
+				}
+			} else {
 			}
 			InteractivityService.this.stopSelf();
 		}
 	};
-	
+
 	private void removeOld(long age) {
 		Time t = new Time();
 		t.setToNow();
 		long cur = t.toMillis(false);
-		while(mActs.peek() != null) {
-		//	System.out.println("cur: " + cur + " old: " + mActs.peek().toMillis(false));
-			if(mActs.peek().toMillis(false)+age < cur) {
+		while (mActs.peek() != null) {
+			// System.out.println("cur: " + cur + " old: " +
+			// mActs.peek().toMillis(false));
+			if (mActs.peek().toMillis(false) + age < cur) {
 				mActs.remove();
-			}
-			else {
+			} else {
 				break;
 			}
 		}
-		
-			
+
 	}
-    
-    
+
 	class InteractivityView extends View {
 
 		public InteractivityView(Context context) {
 			super(context);
 		}
-		
-	    @Override
-	    public boolean onTouchEvent(MotionEvent event) {
-	        //return super.onTouchEvent(event);
-	    //	System.out.println("good2");
-	    //    Toast.makeText(getContext(),"onTouchEvent", Toast.LENGTH_LONG).show();
-	        return false;
-	    }
-		
+
+		@Override
+		public boolean onTouchEvent(MotionEvent event) {
+			// return super.onTouchEvent(event);
+			// System.out.println("good2");
+			// Toast.makeText(getContext(),"onTouchEvent",
+			// Toast.LENGTH_LONG).show();
+			return false;
+		}
+
 	}
-	
+
 	class InteractivityListener extends SimpleOnGestureListener {
-		
-		
+
 		public boolean onTouchEvent(MotionEvent e) {
 			System.out.println("good");
-			Toast.makeText(getBaseContext(), "HELLLLLLLOOOOOOO WORLD! ", 0).show();
+			Toast.makeText(getBaseContext(), "HELLLLLLLOOOOOOO WORLD! ", 0)
+					.show();
 			return false;
 		}
 	}
-	
-	
-	
-	
+
 	@Override
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
 		return mBinder;
 	}
+
 	private final IBinder mBinder = new InteractBinder();
-	
-    public class InteractBinder extends Binder {
-        InteractivityService getService() {
-            return InteractivityService.this;
-        }
-    }
+
+	public class InteractBinder extends Binder {
+		InteractivityService getService() {
+			return InteractivityService.this;
+		}
+	}
 }

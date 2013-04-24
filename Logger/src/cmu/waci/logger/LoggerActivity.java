@@ -14,7 +14,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 public class LoggerActivity extends Activity {
 	private static final String TAG = "LoggerActivity";
@@ -22,26 +26,76 @@ public class LoggerActivity extends Activity {
 	private LoggerService mLogger;
 	private InteractivityService mInteract;
 	private boolean mBound, mBound2;
+	private Button startButton;
+	private Button stopButton;
+
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logger);
         
+        startButton = (Button)this.findViewById(R.id.Start);
+        stopButton = (Button)this.findViewById(R.id.Stop);
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	//TODO
+            	startLogging() ;
+            }
+        });
+        stopButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	//TODO
+            	stopLogging();
+            }
+        });       
+               
         System.out.println("HELLO?");
         Toast.makeText(this, "hi ",0).show();
  //       System.out.println(Arrays.toString(CPUInfo.getCPUStats()));
         
   //      mLogger.bindService(new Intent(this, 
   //              LoggerService.class), mConnection, Context.BIND_AUTO_CREATE);
-        Intent intent = new Intent(this, LoggerService.class);
-        Intent intent2 = new Intent(this,  InteractivityService.class);
-        bindService(intent2, mConnection2, Context.BIND_AUTO_CREATE);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
+    }
+    
+    public void onToggleClicked(View view) {
+        // Is the toggle on?
+        boolean on = ((ToggleButton) view).isChecked();
+        
+        if (on) {
+            // Enable CPU scaling
+        	//savePowerOn = true;
+        } else {
+            // Disable CPU scaling
+        	//savePowerOn = false;
+        }
     }
 
 
+    private void startLogging() {
+    	Toast.makeText(this, "Start Logging! ",1).show();
+        Intent intent = new Intent(this, LoggerService.class);
+        Intent intent2 = new Intent(this,  InteractivityService.class);
+        bindService(intent2, mConnection2, Context.BIND_AUTO_CREATE);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);   
+    }
     
+    private void stopLogging() {
+    	Toast.makeText(this, "Stop Logging! ",1).show();
+        // Unbind from the service
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+        
+        if (mBound2) {
+            unbindService(mConnection2);
+            mBound2 = false;
+        }   	
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -61,16 +115,7 @@ public class LoggerActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
-        // Unbind from the service
-        if (mBound) {
-            unbindService(mConnection);
-            mBound = false;
-        }
-        
-        if (mBound2) {
-            unbindService(mConnection2);
-            mBound2 = false;
-        }
+
     }
 
 
