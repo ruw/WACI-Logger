@@ -200,6 +200,7 @@ public class LoggerService extends Service{
 	                int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 	                float currentVoltage = (float)batteryStatus.getIntExtra("voltage", 0) / 1000;
 	                float batteryPct = level / (float)scale;
+	                System.out.println(scale);
 	           /*    
 	                //TODO Accelerometer
 	                sensAcc = sensMan.getSensorList(Sensor.TYPE_ACCELEROMETER);
@@ -249,7 +250,7 @@ public class LoggerService extends Service{
 	            		 
 	                
 	                mOut.write(outputString);
-	                SystemClock.sleep(500);
+	                SystemClock.sleep(5000);
 	
 	            } catch (IOException e) {
 	                Log.e(TAG, "Exception appending to log file",e);

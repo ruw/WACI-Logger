@@ -108,7 +108,7 @@ public class InteractivityService extends Service {
 			System.out.println("wat");
 			ArrayList<Integer> freqModes = dvfs.getFrequencyScaleModes();
 
-			
+		/*	
 			while (mRunning) {
 				removeOld(30000);
 				if (savePowerOn) {
@@ -124,12 +124,32 @@ public class InteractivityService extends Service {
 						dvfs.setCPUFrequency(freqModes.get(6));
 					else
 						dvfs.setCPUFrequency(freqModes.get(10));
-					// System.out.println("freq: " + dvfs.getCPUFrequency() +
-					// " presses: " + mActs.size());
 				}
+				System.out.println("freq: " + dvfs.getCPUFrequency() +
+						 " presses: " + mActs.size());
 				SystemClock.sleep(5000);
 			}
-
+*/
+			//util
+			while(mRunning) {
+				
+				if(savePowerOn){
+					float pctAcc=0;
+					for(int i=0;i<10;i++) {
+						pctAcc+=CPUInfo.getCPUUtilizationPct();
+						SystemClock.sleep(500);
+					}
+					pctAcc /= 10;
+					
+					if(pctAcc<33)	
+						dvfs.setCPUFrequency(freqModes.get(1));
+					else if(pctAcc<66)
+						dvfs.setCPUFrequency(freqModes.get(4));
+					else
+						dvfs.setCPUFrequency(freqModes.get(8));
+				}
+				
+			}
 			stopForeground(true);
 			mActs = null;
 			InteractivityService.this.stopSelf();
