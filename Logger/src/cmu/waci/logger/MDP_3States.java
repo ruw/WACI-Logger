@@ -1,7 +1,13 @@
 package cmu.waci.logger;
 
+import java.util.ArrayList;
+
 /*
 // For Inter 5s
+ 
+ 	ArrayList<Integer> freqModes = dvfs.getFrequencyScaleModes();
+ 	
+ 	int freqs[] = {freqModes.get(1),freqModes.get(4),freqModes.get(10)};
  
  	int pow5_s = 0;
  	int pow15_s = 0;
@@ -14,11 +20,11 @@ package cmu.waci.logger;
  	double[][] perf5_t = {{.84776,.15224,0},{.03976,.95543,.00481},{0,.1291,.87079}};
  	double[][] perf15_t = {{.93094,.06906,0},{.0088,.9901,.0011},{0,.11111,.88889}};	
  
- 	MDP_3States pow5 = new MDP_3States(pow5_s,pow5_t);
-  	MDP_3States pow15 = new MDP_3States(pow15_s,pow15_t);
+ 	MDP_3States pow5 = new MDP_3States(pow5_s,pow5_t,freqs);
+  	MDP_3States pow15 = new MDP_3States(pow15_s,pow15_t,freqs);
 
- 	MDP_3States perf5 = new MDP_3States(perf5_s,perf5_t);
-  	MDP_3States perf15 = new MDP_3States(perf15_s,perf15_t);
+ 	MDP_3States perf5 = new MDP_3States(perf5_s,perf5_t,freqs);
+  	MDP_3States perf15 = new MDP_3States(perf15_s,perf15_t,freqs);
 
  */
 
@@ -31,11 +37,13 @@ public class MDP_3States {
 	private static int S2 = 2;
 	
 	private double P[][] = new double[3][3];
+	private int freq[] = new int[3];
 	
 	// Assume only three states
-	public MDP_3States(int curr, double tran[][]) {
+	public MDP_3States(int curr, double tran[][], int inFreq[]) {
 		CurrState = curr;
 		P = tran;
+		freq = inFreq;
 	}
 	
 	public int getNextState(int curr) {
@@ -57,6 +65,10 @@ public class MDP_3States {
 	public int getCurrState() {
         return CurrState;
     }
+	
+	public int getFreq() {
+		return freq[CurrState];
+	}
 	
 	public double getTransition(int to, int from) {
 		return P[to][from];
