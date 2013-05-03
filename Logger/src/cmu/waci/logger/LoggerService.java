@@ -68,8 +68,7 @@ public class LoggerService extends Service{
     private boolean mRunning;
     Date date;
 	
-    //public static DVFSControl DVFSController;
-    
+    //public static DVFSControl DVFSController;   
     
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	public void onCreate() {
@@ -93,15 +92,8 @@ public class LoggerService extends Service{
         date = new Date();
         
         mNetInfo = new NetInfo(wifiMan, connMan, telMan);
-        Toast.makeText(this, "poop ",1).show();
-        System.out.println("ppop");
-        
-        
-
-        
-        
-        
-        
+        Toast.makeText(this, "Create LoggerService ",1).show();
+        System.out.println("Create LoggerService");
         
         Thread thr = new Thread(null, doWork, "Logger service");
         thr.start();
@@ -121,14 +113,13 @@ public class LoggerService extends Service{
             		.setSmallIcon(R.drawable.ic_launcher)
                     .getNotification();
             
-            startForeground(1337, note);
-        	
+            startForeground(1337, note);      	
         	
         	
         	boolean mExternalStorageAvailable = false;
         	boolean mExternalStorageWriteable = false;
         	String state = Environment.getExternalStorageState();
-        	System.out.println("wat");
+        	//System.out.println("wat");
         	
 
         	if (Environment.MEDIA_MOUNTED.equals(state)) {
@@ -143,7 +134,7 @@ public class LoggerService extends Service{
         	    //  to know is we can neither read nor write
         	    mExternalStorageAvailable = mExternalStorageWriteable = false;
         	}
-        	System.out.println("wat2");
+        	//System.out.println("wat2");
         	//can't open a file, abort
         	if(!(mExternalStorageAvailable && mExternalStorageWriteable)) {
         		Log.e(TAG, "Could not get external storage");
@@ -162,9 +153,7 @@ public class LoggerService extends Service{
             } catch(IOException e) {
             	Log.e(TAG, "Exception opening log file",e);
             	LoggerService.this.stopSelf();
-            }
-                    
-        	
+            }   	
           
             while(mRunning) {
             
@@ -248,7 +237,7 @@ public class LoggerService extends Service{
 	                       CPUInfo.getProcessesRunning(),
 	                       CPUInfo.getProcessesBlocked(), powMan.isScreenOn() ? 1 : 0);
 	            		 
-	                
+	               	mOut.write(date.toString()+",");
 	                mOut.write(outputString);
 	                SystemClock.sleep(5000);
 	

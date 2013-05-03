@@ -31,8 +31,9 @@ public class LoggerActivity extends Activity {
 	private Button startButton;
 	private Button stopButton;
 	private RadioGroup radioOptGroup;
-	private RadioButton radioOptButton;
+	private ToggleButton toggleButton;
 	
+	private boolean started = false;
 
 	
     @Override
@@ -43,8 +44,8 @@ public class LoggerActivity extends Activity {
         setupButtons();
  
                
-        System.out.println("HELLO?");
-        Toast.makeText(this, "hi ",0).show();
+        System.out.println("Start Activity!");
+        Toast.makeText(this, "Start Activity! ",1).show();
  //       System.out.println(Arrays.toString(CPUInfo.getCPUStats()));
         
   //      mLogger.bindService(new Intent(this, 
@@ -56,19 +57,52 @@ public class LoggerActivity extends Activity {
     	radioOptGroup = (RadioGroup)this.findViewById(R.id.optState);
         startButton = (Button)this.findViewById(R.id.Start);
         stopButton = (Button)this.findViewById(R.id.Stop);
+        toggleButton = (ToggleButton)this.findViewById(R.id.toggleButton);
+        
+        toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+        	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // The toggle is enabled
+                	System.out.println("Pressed On");
+                } else {
+                    // The toggle is disabled
+                	System.out.println("Pressed Off");
+                }
+            }
+        });
+        
+        
+        radioOptGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	//TODO
+            	int selectedId = radioOptGroup.getCheckedRadioButtonId();
+            	if(selectedId == R.id.optPerf) {  	
+            		InteractivityService.startOptPerf();
+            		System.out.println("perf");
+            	}
+            	else if(selectedId == R.id.optPow) {
+            		InteractivityService.startOptPow();
+            		System.out.println("pow");
+            	}
+            	
+            }
+        });
+        
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
             	//TODO
             	int selectedId = radioOptGroup.getCheckedRadioButtonId();
-            	startLogging();
-            	if(selectedId == R.id.optPerf) {
-            	
-            		mInteract.startOptPerf();
+            	if (!started)
+            		startLogging();
+            	if(selectedId == R.id.optPerf) {  	
+            		InteractivityService.startOptPerf();
             		System.out.println("perf");
             	}
             	else if(selectedId == R.id.optPow) {
-            		mInteract.startOptPow();
+            		InteractivityService.startOptPow();
             		System.out.println("pow");
             	}
             	
@@ -85,23 +119,26 @@ public class LoggerActivity extends Activity {
         });      
     }
     
+    /*
     public void onToggleClicked(View view) {
         // Is the toggle on?
         boolean on = ((ToggleButton) view).isChecked();
         
         if (on) {
             // Enable CPU scaling
-        	Toast.makeText(this, "TURN ON! ",1).show();
+        	Toast.makeText(this.getApplicationContext(), "Toggle TURN ON! ",1).show();
         	//mInteract.savePowerOn = true;
         } else {
             // Disable CPU scaling
-        	Toast.makeText(this, "TURN OFF! ",1).show();
+        	Toast.makeText(this.getApplicationContext(), "Toggle TURN OFF! ",1).show();
         	//mInteract.savePowerOn = false;
         }
     }
 
+*/
 
     private void startLogging() {
+    	started = true;
     	Toast.makeText(this, "Start Logging! ",1).show();
         Intent intent = new Intent(this, LoggerService.class);
         Intent intent2 = new Intent(this,  InteractivityService.class);
@@ -110,6 +147,7 @@ public class LoggerActivity extends Activity {
     }
     
     private void stopLogging() {
+    	started = false;
     	Toast.makeText(this, "Stop Logging! ",1).show();
         // Unbind from the service
         if (mBound) {
@@ -141,7 +179,6 @@ public class LoggerActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
-
     }
 
 

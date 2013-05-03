@@ -32,7 +32,7 @@ public final class R {
         public static final int optPow=0x7f080005;
         public static final int optState=0x7f080002;
         public static final int textView1=0x7f080006;
-        public static final int toggleButton1=0x7f080007;
+        public static final int toggleButton=0x7f080007;
     }
     public static final class layout {
         public static final int activity_logger=0x7f030000;
@@ -50,6 +50,8 @@ public final class R {
         public static final int opt_none=0x7f050006;
         public static final int opt_perf=0x7f050007;
         public static final int opt_pow=0x7f050008;
+        public static final int optimization=0x7f050009;
+        public static final int toggle_button=0x7f05000a;
     }
     public static final class style {
         /** 

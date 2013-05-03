@@ -121,7 +121,7 @@ public class InteractivityService extends Service {
 				Time t = new Time();
 				t.setToNow();
 				mActs.add(t);
-				 System.out.println("good1");
+				 System.out.println("Touch!");
 				// System.out.println(mActs.size());
 
 				long m = mActs.getFirst().toMillis(false);
@@ -144,7 +144,7 @@ public class InteractivityService extends Service {
 
 	}
 	
-	public void startOptPow() {
+	public static void startOptPow() {
 		curOptPow = true;
 	}
 	
@@ -152,7 +152,7 @@ public class InteractivityService extends Service {
 		curOptPow = false;
 	}
 	
-	public void startOptPerf() {
+	public static void startOptPerf() {
 		curOptPerf = true;
 	}
 	
@@ -186,6 +186,7 @@ public class InteractivityService extends Service {
             startForeground(1338, note);
 			
             while (mRunning) {
+            	removeOld(30000);
             	// Depending on optimization selection
             	if (curOptPow) {
             		p_ns0 = pow_ns0;
@@ -217,34 +218,36 @@ public class InteractivityService extends Service {
             		}
             	}
             	
-            	//Do transtion
-              	switch (nextState) {
-          		case 0:
-          			p_ns0.doRun();
-          			guessFreq = p_ns0.getFreq();
-          			currState = p_ns0.getCurrState();
-          			p_ns1.setCurrState(currState);
-          			p_ns2.setCurrState(currState); 			
-          			break;
-          		case 1:
-          		  	p_ns1.doRun();
-          			guessFreq = p_ns1.getFreq();
-          			currState = p_ns1.getCurrState();
-          			p_ns0.setCurrState(currState);
-          			p_ns2.setCurrState(currState); 	
-          			break;
-          		case 2:
-          		  	p_ns2.doRun();
-          			guessFreq = p_ns2.getFreq();
-          			currState = p_ns2.getCurrState();
-          			p_ns0.setCurrState(currState);
-          			p_ns2.setCurrState(currState); 	
-          			break;
-          		default:
-          			break;  	
-              	}
-              	dvfs.setCPUFrequency(guessFreq);
-              	SystemClock.sleep(5000);          	
+            	if (curOptPow || curOptPerf) {
+					// Do transtion
+					switch (nextState) {
+					case 0:
+						p_ns0.doRun();
+						guessFreq = p_ns0.getFreq();
+						currState = p_ns0.getCurrState();
+						p_ns1.setCurrState(currState);
+						p_ns2.setCurrState(currState);
+						break;
+					case 1:
+						p_ns1.doRun();
+						guessFreq = p_ns1.getFreq();
+						currState = p_ns1.getCurrState();
+						p_ns0.setCurrState(currState);
+						p_ns2.setCurrState(currState);
+						break;
+					case 2:
+						p_ns2.doRun();
+						guessFreq = p_ns2.getFreq();
+						currState = p_ns2.getCurrState();
+						p_ns0.setCurrState(currState);
+						p_ns2.setCurrState(currState);
+						break;
+					default:
+						break;
+					}
+					dvfs.setCPUFrequency(guessFreq);
+					SystemClock.sleep(5000);
+				}
             }
 		/*	
 			while (mRunning) {
@@ -343,8 +346,8 @@ public class InteractivityService extends Service {
 	class InteractivityListener extends SimpleOnGestureListener {
 
 		public boolean onTouchEvent(MotionEvent e) {
-			System.out.println("good");
-			Toast.makeText(getBaseContext(), "HELLLLLLLOOOOOOO WORLD! ", 0)
+			System.out.println("Touch.");
+			Toast.makeText(getBaseContext(), "HELLLLLLLOOOOOOO WORLD! ", 1)
 					.show();
 			return false;
 		}

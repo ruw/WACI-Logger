@@ -65,17 +65,17 @@
 	    android:layout_height="wrap_content"
 	    android:layout_above="@+id/optState"
 	    android:layout_centerHorizontal="true"
-	    android:text="Optimization:"
+	    android:text="@string/optimization"
 	    android:textAppearance="?android:attr/textAppearanceLarge" />
 
 	<ToggleButton
-	    android:id="@+id/toggleButton1"
+	    android:id="@+id/toggleButton"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:layout_alignLeft="@+id/Start"
 	    android:layout_alignRight="@+id/Stop"
 	    android:layout_below="@+id/Start"
 	    android:layout_marginTop="68dp"
-	    android:text="ToggleButton" />
+	    android:text="@string/toggle_button" />
 
 </RelativeLayout>

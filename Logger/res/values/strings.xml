@@ -11,4 +11,7 @@
 	<string name="opt_none">None</string>
 	<string name="opt_perf">Performance</string>
     <string name="opt_pow">Power</string>
+    
+    <string name="optimization">Optimization:</string>
+    <string name="toggle_button">Toggle Button:</string>
 </resources>
