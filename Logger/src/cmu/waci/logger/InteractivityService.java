@@ -56,7 +56,7 @@ public class InteractivityService extends Service {
 				Time t = new Time();
 				t.setToNow();
 				mActs.add(t);
-				// System.out.println("good1");
+				 System.out.println("good1");
 				// System.out.println(mActs.size());
 
 				long m = mActs.getFirst().toMillis(false);
@@ -146,7 +146,7 @@ public class InteractivityService extends Service {
 					else if(pctAcc<66)
 						dvfs.setCPUFrequency(freqModes.get(4));
 					else
-						dvfs.setCPUFrequency(freqModes.get(8));
+						dvfs.setCPUFrequency(freqModes.get(10));
 				}
 				
 			}
@@ -175,6 +175,7 @@ public class InteractivityService extends Service {
 
 	public void onDestroy() {
 		mRunning = false;
+		mView.setOnTouchListener(null);
 	}
 	
 	class InteractivityView extends View {
@@ -183,14 +184,19 @@ public class InteractivityService extends Service {
 			super(context);
 		}
 
-		@Override
+	/*	@Override
 		public boolean onTouchEvent(MotionEvent event) {
 			// return super.onTouchEvent(event);
-			// System.out.println("good2");
-			// Toast.makeText(getContext(),"onTouchEvent",
-			// Toast.LENGTH_LONG).show();
+			 System.out.println("good2");
+			 System.out.println("good3");
+			Time t = new Time();
+			t.setToNow();
+	//		mActs.add(t);
+	//		System.out.println(mActs.size());
+			//Toast.makeText(getContext(),"onTouchEvent",
+			//		Toast.LENGTH_LONG).show();
 			return false;
-		}
+		}*/
 
 	}
 
