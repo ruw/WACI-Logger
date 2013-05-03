@@ -86,6 +86,7 @@ public class CPUInfo {
                             temp6 = mStealTime + mGuestTime;
                             mStealTime = Integer.parseInt(buf[7]);
                             mGuestTime = Integer.parseInt(buf[8]);
+                            /*
                             total = mNormalUserProcessTime
                                     + mNicedUserProcessTime + mSystemProcessTime
                                     + mIdleProcessTime + mIoWaitTime + mIrqTime
@@ -93,6 +94,12 @@ public class CPUInfo {
                             totalDiff = total
                                     - (temp + temp1 + temp2 + temp3 + temp4 
                                     + temp5 + temp6);
+                            */
+                            total = mNormalUserProcessTime
+                                    + mNicedUserProcessTime + mSystemProcessTime
+                                    + mIdleProcessTime + mIoWaitTime;
+                            totalDiff = total
+                                    - (temp + temp1 + temp2 + temp3 + temp4);
                             mIdlePct = ((mIdleProcessTime - temp3) * 100)
                                     / totalDiff;
                             mSystemPct = ((mSystemProcessTime - temp2) * 100)

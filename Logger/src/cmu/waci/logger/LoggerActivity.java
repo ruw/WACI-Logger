@@ -55,19 +55,38 @@ public class LoggerActivity extends Activity {
     
     private void setupButtons() {
     	radioOptGroup = (RadioGroup)this.findViewById(R.id.optState);
-        startButton = (Button)this.findViewById(R.id.Start);
-        stopButton = (Button)this.findViewById(R.id.Stop);
+        //startButton = (Button)this.findViewById(R.id.Start);
+        //stopButton = (Button)this.findViewById(R.id.Stop);
         toggleButton = (ToggleButton)this.findViewById(R.id.toggleButton);
         
         toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
         	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                	int selectedId = radioOptGroup.getCheckedRadioButtonId();
                     // The toggle is enabled
                 	System.out.println("Pressed On");
+                	if (!started)
+                		startLogging();
+                	
+                  	if(selectedId == R.id.optPerf) {  
+                		System.out.println("Selected Performance");
+                		InteractivityService.startOptPerf();
+                	}
+                	else if(selectedId == R.id.optPow) {
+                		System.out.println("Selected Power");
+                		InteractivityService.startOptPow();
+                	} else if(selectedId == R.id.optNone) {
+                		System.out.println("Selected None");
+                		InteractivityService.stopOptPow();
+                		InteractivityService.stopOptPerf();
+                	}
                 } else {
                     // The toggle is disabled
                 	System.out.println("Pressed Off");
+                	InteractivityService.stopOptPerf();
+                	InteractivityService.stopOptPow();
+                	stopLogging();
                 }
             }
         });
@@ -78,18 +97,22 @@ public class LoggerActivity extends Activity {
             public void onClick(View v) {
             	//TODO
             	int selectedId = radioOptGroup.getCheckedRadioButtonId();
-            	if(selectedId == R.id.optPerf) {  	
+            	if(selectedId == R.id.optPerf) {  
+            		System.out.println("Selected Performance");
             		InteractivityService.startOptPerf();
-            		System.out.println("perf");
-            	}
-            	else if(selectedId == R.id.optPow) {
+            	} else if(selectedId == R.id.optPow) {
+            		System.out.println("Selected Power");
             		InteractivityService.startOptPow();
-            		System.out.println("pow");
+            	} else if(selectedId == R.id.optNone) {
+            		System.out.println("Selected None");
+            		InteractivityService.stopOptPow();
+            		InteractivityService.stopOptPerf();
             	}
             	
             }
         });
         
+        /*
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,7 +139,8 @@ public class LoggerActivity extends Activity {
             	InteractivityService.stopOptPow();
             	stopLogging();
             }
-        });      
+        }); 
+        */     
     }
     
     /*
@@ -217,4 +241,8 @@ public class LoggerActivity extends Activity {
             mBound2 = false;
         }
     };
+    
+    @Override
+    public void onBackPressed() {
+    }
 }

@@ -5,13 +5,17 @@
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
 	<string name="edit_message">Enter a message.</string>
+	
+	<!-- 
 	<string name="button_start">Start</string>
 	<string name="button_stop">Stop</string>
+	-->
 	
 	<string name="opt_none">None</string>
 	<string name="opt_perf">Performance</string>
     <string name="opt_pow">Power</string>
     
-    <string name="optimization">Optimization:</string>
+    <string name="txt_optimization">Optimization:</string>
+    <string name="txt_currently">Currently:</string>
     <string name="toggle_button">Toggle Button:</string>
 </resources>

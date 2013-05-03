@@ -83,7 +83,7 @@ public class InteractivityService extends Service {
 	
 	public void onCreate() {
 		super.onCreate();
-		System.out.println("h");
+		//System.out.println("h");
 		mActs = new LinkedList<Time>();
 		mView = new InteractivityView(this);
 		dvfs = new DVFSControl();
@@ -146,6 +146,7 @@ public class InteractivityService extends Service {
 	
 	public static void startOptPow() {
 		curOptPow = true;
+		curOptPerf = false;
 	}
 	
 	public static void stopOptPow() {
@@ -154,6 +155,7 @@ public class InteractivityService extends Service {
 	
 	public static void startOptPerf() {
 		curOptPerf = true;
+		curOptPow = false;
 	}
 	
 	public static void stopOptPerf() {
@@ -186,7 +188,7 @@ public class InteractivityService extends Service {
             startForeground(1338, note);
 			
             while (mRunning) {
-            	removeOld(30000);
+            	removeOld(15000);
             	// Depending on optimization selection
             	if (curOptPow) {
             		p_ns0 = pow_ns0;
@@ -246,6 +248,10 @@ public class InteractivityService extends Service {
 						break;
 					}
 					dvfs.setCPUFrequency(guessFreq);
+					
+					//TODO
+					System.out.println("CurrSetting-> State: "+currState+", Pow: "+curOptPow+ ", Perf: "+curOptPerf);
+					
 					SystemClock.sleep(5000);
 				}
             }
@@ -346,8 +352,8 @@ public class InteractivityService extends Service {
 	class InteractivityListener extends SimpleOnGestureListener {
 
 		public boolean onTouchEvent(MotionEvent e) {
-			System.out.println("Touch.");
-			Toast.makeText(getBaseContext(), "HELLLLLLLOOOOOOO WORLD! ", 1)
+			System.out.println("Different Touch");
+			Toast.makeText(getBaseContext(), "Different Touch! ", 1)
 					.show();
 			return false;
 		}
