@@ -17,6 +17,8 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -28,6 +30,9 @@ public class LoggerActivity extends Activity {
 	private boolean mBound, mBound2;
 	private Button startButton;
 	private Button stopButton;
+	private RadioGroup radioOptGroup;
+	private RadioButton radioOptButton;
+	
 
 	
     @Override
@@ -35,22 +40,8 @@ public class LoggerActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logger);
         
-        startButton = (Button)this.findViewById(R.id.Start);
-        stopButton = (Button)this.findViewById(R.id.Stop);
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            	//TODO
-            	startLogging() ;
-            }
-        });
-        stopButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            	//TODO
-            	stopLogging();
-            }
-        });       
+        setupButtons();
+ 
                
         System.out.println("HELLO?");
         Toast.makeText(this, "hi ",0).show();
@@ -61,6 +52,39 @@ public class LoggerActivity extends Activity {
 
     }
     
+    private void setupButtons() {
+    	radioOptGroup = (RadioGroup)this.findViewById(R.id.optState);
+        startButton = (Button)this.findViewById(R.id.Start);
+        stopButton = (Button)this.findViewById(R.id.Stop);
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	//TODO
+            	int selectedId = radioOptGroup.getCheckedRadioButtonId();
+            	startLogging();
+            	if(selectedId == R.id.optPerf) {
+            	
+            		InteractivityService.startOptPerf();
+            		System.out.println("perf");
+            	}
+            	else if(selectedId == R.id.optPow) {
+            		InteractivityService.startOptPow();
+            		System.out.println("pow");
+            	}
+            	
+            }
+        });
+        stopButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	//TODO
+            	mInteract.stopOptPerf();
+            	mInteract.stopOptPow();
+            	stopLogging();
+            }
+        });      
+    }
+  /*  
     public void onToggleClicked(View view) {
         // Is the toggle on?
         boolean on = ((ToggleButton) view).isChecked();
@@ -73,7 +97,7 @@ public class LoggerActivity extends Activity {
         	InteractivityService.savePowerOn = false;
         }
     }
-
+*/
 
     private void startLogging() {
     	Toast.makeText(this, "Start Logging! ",1).show();

@@ -7,4 +7,8 @@
 	<string name="edit_message">Enter a message.</string>
 	<string name="button_start">Start</string>
 	<string name="button_stop">Stop</string>
+	
+	<string name="opt_none">None</string>
+	<string name="opt_perf">Performance</string>
+    <string name="opt_pow">Power</string>
 </resources>

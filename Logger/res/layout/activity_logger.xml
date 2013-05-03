@@ -23,17 +23,6 @@
         android:layout_marginRight="53dp"
         android:text="@string/button_stop" />
 
-    <ToggleButton
-        android:id="@+id/toggleOptimizePower"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/Stop"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="16dp"
-        android:onClick="onToggleClicked"
-        android:textOff="Save Power off"
-        android:textOn="Save Power on" />
-
     <Button
         android:id="@+id/Start"
         android:layout_width="110dp"
@@ -42,5 +31,42 @@
         android:layout_marginTop="165dp"
         android:layout_toLeftOf="@+id/Stop"
         android:text="@string/button_start" />
+
+	<RadioGroup
+	    android:id="@+id/optState"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_above="@+id/Stop"
+	    android:layout_centerHorizontal="true" >
+
+	    <RadioButton
+	        android:id="@+id/optNone"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="true"
+	        android:text="@string/opt_none" />
+
+	    <RadioButton
+	        android:id="@+id/optPerf"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:checked="true"
+	        android:text="@string/opt_perf" />
+
+	    <RadioButton
+	        android:id="@+id/optPow"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/opt_pow" />
+	</RadioGroup>
+
+	<TextView
+	    android:id="@+id/textView1"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_above="@+id/optState"
+	    android:layout_centerHorizontal="true"
+	    android:text="Optimization:"
+	    android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>

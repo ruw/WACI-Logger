@@ -28,6 +28,8 @@ public class InteractivityService extends Service {
 	private DVFSControl dvfs;
 	static boolean savePowerOn = false;
 	private boolean mRunning;
+	private boolean curOptPow = false;
+	private boolean curOptPerf = false;
 	
 	public void onCreate() {
 		super.onCreate();
@@ -77,6 +79,22 @@ public class InteractivityService extends Service {
 		Thread thr = new Thread(null, doWork, "Interactivity");
 		thr.start();
 
+	}
+	
+	public static void startOptPow() {
+		curOptPow = true;
+	}
+	
+	public static void stopOptPow() {
+		curOptPow = false;
+	}
+	
+	public static void startOptPerf() {
+		curOptPerf = true;
+	}
+	
+	public static void stopOptPerf() {
+		curOptPerf = false;
 	}
 	
 	/*
