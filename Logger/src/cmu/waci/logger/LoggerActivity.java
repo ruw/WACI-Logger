@@ -64,11 +64,11 @@ public class LoggerActivity extends Activity {
             	startLogging();
             	if(selectedId == R.id.optPerf) {
             	
-            		InteractivityService.startOptPerf();
+            		mInteract.startOptPerf();
             		System.out.println("perf");
             	}
             	else if(selectedId == R.id.optPow) {
-            		InteractivityService.startOptPow();
+            		mInteract.startOptPow();
             		System.out.println("pow");
             	}
             	
@@ -78,26 +78,28 @@ public class LoggerActivity extends Activity {
             @Override
             public void onClick(View v) {
             	//TODO
-            	mInteract.stopOptPerf();
-            	mInteract.stopOptPow();
+            	InteractivityService.stopOptPerf();
+            	InteractivityService.stopOptPow();
             	stopLogging();
             }
         });      
     }
-  /*  
+    
     public void onToggleClicked(View view) {
         // Is the toggle on?
         boolean on = ((ToggleButton) view).isChecked();
         
         if (on) {
             // Enable CPU scaling
-        	InteractivityService.savePowerOn = true;
+        	Toast.makeText(this, "TURN ON! ",1).show();
+        	//mInteract.savePowerOn = true;
         } else {
             // Disable CPU scaling
-        	InteractivityService.savePowerOn = false;
+        	Toast.makeText(this, "TURN OFF! ",1).show();
+        	//mInteract.savePowerOn = false;
         }
     }
-*/
+
 
     private void startLogging() {
     	Toast.makeText(this, "Start Logging! ",1).show();

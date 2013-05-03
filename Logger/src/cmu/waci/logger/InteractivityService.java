@@ -26,10 +26,60 @@ public class InteractivityService extends Service {
 	InteractivityView mView;
 	static LinkedList<Time> mActs;
 	private DVFSControl dvfs;
+	
 	static boolean savePowerOn = false;
 	private boolean mRunning;
-	private boolean curOptPow = false;
-	private boolean curOptPerf = false;
+	private static boolean curOptPow = false;
+	private static boolean curOptPerf = false;
+	
+	private int util_ind = 0;
+	private int inter_ind = 0;
+	int[] interRecord = {0,0,0,0,0,0,0,0,0,0};
+	int[] utilRecord = {0,0,0,0,0,0,0,0,0,0};
+	
+	// Markov States
+	private int nextState = 0;
+	private int currState = 0;
+	private int guessFreq = 0;
+	
+	// Transition Rates For Performance Metric
+	double[][] perf_t0 = {{.7,.3,0},{.5,.5,0},{0,1,0}};
+	double[][] perf_t1 = {{.12,88,0},{.1,.88,.02},{0,.96,.04}};
+	double[][] perf_t2 = {{0,1,0},{0,.43,.57},{0,.39,.61}};
+ 	MDP_3States perf_ns0;
+ 	MDP_3States perf_ns1;  	
+ 	MDP_3States perf_ns2;
+ 	
+	// Transition Rates For Power Metric	
+	double[][] pow_t0 = {{.99,.01,0},{.999,.001,0},{0,1,0}};
+ 	double[][] pow_t1 = {{.001,.999,0},{.12,.87,.01},{0,.999,.001}};
+ 	double[][] pow_t2 = {{0,1,0},{0,.67,.33},{0,.1,.9}};
+ 	MDP_3States pow_ns0;
+ 	MDP_3States pow_ns1;  	
+ 	MDP_3States pow_ns2;
+ 	
+ 	//Selected Transition matrices
+ 	MDP_3States p_ns0;
+ 	MDP_3States p_ns1;
+ 	MDP_3States p_ns2;
+	
+	private double getAvg(int rec[]) {
+		double sum = 0;
+		for (int i=0; i<10; i++) {
+			sum += rec[i];
+		}
+		return sum*1.0/10;
+	}
+	
+	private void addUtil(int data) {
+		utilRecord[util_ind] = data;
+		util_ind = (util_ind+1)%10;
+	}
+	
+	private void addInter(int data) {
+		interRecord[inter_ind] = data;
+		inter_ind = (inter_ind+1)%10;
+	}
 	
 	public void onCreate() {
 		super.onCreate();
@@ -37,6 +87,19 @@ public class InteractivityService extends Service {
 		mActs = new LinkedList<Time>();
 		mView = new InteractivityView(this);
 		dvfs = new DVFSControl();
+		
+		//Setup 3 CPU frequency states
+		ArrayList<Integer> freqModes = dvfs.getFrequencyScaleModes();
+		int freqs[] = {freqModes.get(1),freqModes.get(4),freqModes.get(10)};
+		//Setup transition matrices
+		//Performance
+	 	perf_ns0 = new MDP_3States(0,perf_t0,freqs);
+	 	perf_ns1 = new MDP_3States(0,perf_t1,freqs);  	
+	 	perf_ns2 = new MDP_3States(0,perf_t2,freqs); 	
+	 	//Power
+	 	pow_ns0 = new MDP_3States(0,pow_t0,freqs);
+	 	pow_ns1 = new MDP_3States(0,pow_t1,freqs);  	
+	 	pow_ns2 = new MDP_3States(0,pow_t2,freqs);		
 
 		mRunning = true;
 		
@@ -81,7 +144,7 @@ public class InteractivityService extends Service {
 
 	}
 	
-	public static void startOptPow() {
+	public void startOptPow() {
 		curOptPow = true;
 	}
 	
@@ -89,7 +152,7 @@ public class InteractivityService extends Service {
 		curOptPow = false;
 	}
 	
-	public static void startOptPerf() {
+	public void startOptPerf() {
 		curOptPerf = true;
 	}
 	
@@ -122,10 +185,67 @@ public class InteractivityService extends Service {
     
             startForeground(1338, note);
 			
-			
-			System.out.println("wat");
-			ArrayList<Integer> freqModes = dvfs.getFrequencyScaleModes();
-
+            while (mRunning) {
+            	// Depending on optimization selection
+            	if (curOptPow) {
+            		p_ns0 = pow_ns0;
+            		p_ns1 = pow_ns1;
+            		p_ns2 = pow_ns2;
+            		
+            		addInter(mActs.size());
+            		double interAvg = getAvg(interRecord);
+            		if (interAvg <= 10) {
+            			nextState = 0;
+            		} else if (interAvg <= 25) {
+            			nextState = 1;
+            		} else {
+            			nextState = 2;
+            		}  	
+            	} else if (curOptPerf) {
+            		p_ns0 = perf_ns0;
+            		p_ns1 = perf_ns1;
+            		p_ns2 = perf_ns2; 
+            		
+            		addUtil(CPUInfo.getCPUUtilizationPct());
+            		double utilAvg = getAvg(utilRecord);
+            		if (utilAvg <= 0.3) {
+            			nextState = 0;
+            		} else if (utilAvg <=0.7) {
+            			nextState = 1;
+            		} else {
+            			nextState = 2;
+            		}
+            	}
+            	
+            	//Do transtion
+              	switch (nextState) {
+          		case 0:
+          			p_ns0.doRun();
+          			guessFreq = p_ns0.getFreq();
+          			currState = p_ns0.getCurrState();
+          			p_ns1.setCurrState(currState);
+          			p_ns2.setCurrState(currState); 			
+          			break;
+          		case 1:
+          		  	p_ns1.doRun();
+          			guessFreq = p_ns1.getFreq();
+          			currState = p_ns1.getCurrState();
+          			p_ns0.setCurrState(currState);
+          			p_ns2.setCurrState(currState); 	
+          			break;
+          		case 2:
+          		  	p_ns2.doRun();
+          			guessFreq = p_ns2.getFreq();
+          			currState = p_ns2.getCurrState();
+          			p_ns0.setCurrState(currState);
+          			p_ns2.setCurrState(currState); 	
+          			break;
+          		default:
+          			break;  	
+              	}
+              	dvfs.setCPUFrequency(guessFreq);
+              	SystemClock.sleep(5000);          	
+            }
 		/*	
 			while (mRunning) {
 				removeOld(30000);
@@ -149,6 +269,7 @@ public class InteractivityService extends Service {
 			}
 */
 			//util
+			/*
 			while(mRunning) {
 				
 				if(savePowerOn){
@@ -168,6 +289,7 @@ public class InteractivityService extends Service {
 				}
 				
 			}
+			*/
 			stopForeground(true);
 			mActs = null;
 			InteractivityService.this.stopSelf();
