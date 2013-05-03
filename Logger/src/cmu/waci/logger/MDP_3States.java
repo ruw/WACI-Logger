@@ -11,7 +11,7 @@ import java.util.ArrayList;
  
  	int pow5_s = 0;
  	int pow15_s = 0;
- 	int perf5_s = 0;
+
  	int perf15_s = 0;
  	
  	double[][] pow5_t = {{.99968,.00032,0},{.01845,.96749,.01406},{0,.0166,.9834}};
@@ -23,10 +23,59 @@ import java.util.ArrayList;
  	MDP_3States pow5 = new MDP_3States(pow5_s,pow5_t,freqs);
   	MDP_3States pow15 = new MDP_3States(pow15_s,pow15_t,freqs);
 
- 	MDP_3States perf5 = new MDP_3States(perf5_s,perf5_t,freqs);
-  	MDP_3States perf15 = new MDP_3States(perf15_s,perf15_t,freqs);
+
+	//TODO
+	int perf_s = 0;
+	int nextPerfState = 0;
+	int currState = 0;
+	int guessFreq = 0;
+	
+	double[][] perf_t0 = {{.7,.3,0},{.5,.5,0},{0,1,0}};
+	//double[][] perf_t1 = {{.12,.3,0},{.5,.5,0},{0,1,0}};
+	double[][] perf_t2 = {{},{},{}};	
+
+ 	MDP_3States perf_ns0 = new MDP_3States(perf_s,perf_t0,freqs);
+ 	MDP_3States perf_ns1 = new MDP_3States(perf_s,perf_t1,freqs);  	
+ 	MDP_3States perf_ns2 = new MDP_3States(perf_s,perf_t2,freqs);  	
+  	
+  	if (CPUInfo.getCPUUtilizationPct()<=0.3) {
+  		nextPerfState = 0;
+  	} else if (CPUInfo.getCPUUtilizationPct()<=0.7) {
+  		nextPerfState = 1;
+  	} else {
+  		nextPerfState = 2;
+  	}
+  	
+  	switch (nextPerfState) {
+  		case 0:
+  			perf_ns0.doRun();
+  			guessFreq = perf_ns0.getFreq();
+  			currState = perf_ns0.getCurrState();
+  			perf_ns1.setCurrState(currState);
+  			perf_ns2.setCurrState(currState); 			
+  			break;
+  		case 1:
+  		  	perf_ns1.doRun();
+  			guessFreq = perf_ns1.getFreq();
+  			currState = perf_ns1.getCurrState();
+  			perf_ns0.setCurrState(currState);
+  			perf_ns2.setCurrState(currState); 	
+  			break;
+  		case 2:
+  		  	perf_ns2.doRun();
+  			guessFreq = perf_ns2.getFreq();
+  			currState = perf_ns2.getCurrState();
+  			perf_ns0.setCurrState(currState);
+  			perf_ns2.setCurrState(currState); 	
+  			break;
+  		default:
+  			break;
+  	
+  	}
+  	
 
  */
+
 
 
 public class MDP_3States {
@@ -46,7 +95,7 @@ public class MDP_3States {
 		freq = inFreq;
 	}
 	
-	public int getNextState(int curr) {
+	public void doRun() {
 		double prob = Math.random();
 		int nextState = CurrState;
 		
@@ -56,14 +105,16 @@ public class MDP_3States {
 			nextState = S1;
 		} else {
 			nextState = S2;
-		}
-		
+		}		
 		CurrState = nextState;
-		return nextState;
 	}
 	
 	public int getCurrState() {
         return CurrState;
+    }
+	
+	public void setCurrState(int curr) {
+        CurrState = curr;
     }
 	
 	public int getFreq() {
