@@ -1,5 +1,5 @@
-package cmu.waci.logger;
-
+package csu.research.AURA;
+// Author: Brad Kyoshi Donohoo
 /*
  * Taken from the absolute dude guy himself
  */

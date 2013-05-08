@@ -12,23 +12,14 @@ import java.sql.Timestamp;
 
 import com.manor.currentwidget.library.CurrentReaderFactory;
 
+import csu.research.AURA.CPUInfo;
+import csu.research.AURA.DVFSControl;
+
 import android.annotation.TargetApi;
-import android.app.ActivityManager;
-import android.app.ApplicationErrorReport.BatteryInfo;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
-import android.location.LocationManager;
-import android.media.AudioManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Binder;
 import android.os.Build;
@@ -36,9 +27,6 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
-import android.provider.Settings.SettingNotFoundException;
-import android.telephony.SignalStrength;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -46,22 +34,9 @@ import android.widget.Toast;
 public class LoggerService extends Service {
 	private static final String TAG = "LoggerService";
 
-	private NotificationManager notMan;
-	private WifiManager wifiMan;
-	private ConnectivityManager connMan;
-	private TelephonyManager telMan;
-	private LocationManager locMan;
-	private ActivityManager actMan;
-	private PackageManager packMan;
 	private PowerManager powMan;
-	private AudioManager audMan;
-	private SensorManager sensMan;// ?
-	private NetInfo mNetInfo;// ?
-	private BatteryInfo battInfo;
-	private SignalStrength sigStrength;
+
 	// private SensorInfo mSensorInfo;
-	private CPUInfo mCpuInfo;
-	private List<Sensor> sensAcc;
 
 	private DVFSControl dvfs;
 
@@ -71,28 +46,14 @@ public class LoggerService extends Service {
 	Timestamp tstamp;
 	Calendar rightNow;
 
-	// public static DVFSControl DVFSController;
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	public void onCreate() {
-		notMan = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		wifiMan = (WifiManager) getSystemService(WIFI_SERVICE);
-		connMan = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-		telMan = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-		locMan = (LocationManager) getSystemService(LOCATION_SERVICE);
-		actMan = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
 		powMan = (PowerManager) getSystemService(POWER_SERVICE);
-		packMan = getPackageManager();
-		audMan = (AudioManager) getSystemService(AUDIO_SERVICE);
-		sensMan = (SensorManager) getSystemService(SENSOR_SERVICE);
-		audMan = (AudioManager) getSystemService(AUDIO_SERVICE);
 
-		// DVFSController = dvfs;
 		dvfs = new DVFSControl();
-		// sigStrength = new SignalStrength();
 		mRunning = true;
 
-		mNetInfo = new NetInfo(wifiMan, connMan, telMan);
 		Toast.makeText(this, "Create LoggerService ", 1).show();
 		System.out.println("Create LoggerService");
 
@@ -118,7 +79,6 @@ public class LoggerService extends Service {
 			boolean mExternalStorageAvailable = false;
 			boolean mExternalStorageWriteable = false;
 			String state = Environment.getExternalStorageState();
-			// System.out.println("wat");
 
 			if (Environment.MEDIA_MOUNTED.equals(state)) {
 				// We can read and write the media
@@ -133,7 +93,6 @@ public class LoggerService extends Service {
 				// to know is we can neither read nor write
 				mExternalStorageAvailable = mExternalStorageWriteable = false;
 			}
-			// System.out.println("wat2");
 			// can't open a file, abort
 			if (!(mExternalStorageAvailable && mExternalStorageWriteable)) {
 				Log.e(TAG, "Could not get external storage");
@@ -144,22 +103,16 @@ public class LoggerService extends Service {
 			
 			Calendar now = Calendar.getInstance();
 			String log_n;
+			//log file name is current date and time
 			log_n = (now.get(Calendar.MONTH)+1)+"_"+(now.get(Calendar.DAY_OF_MONTH)+1)+"_"+
 				now.get(Calendar.HOUR_OF_DAY)+"_"+now.get(Calendar.MINUTE)+"_"+
 				now.get(Calendar.SECOND)+".txt";
 			File log = new File(getExternalFilesDir(null), log_n);
-			//log.delete();
-			//log = new File(getExternalFilesDir(null), "log.txt");
 
 			mOut = null;
 			try {
 				mOut = new BufferedWriter(new FileWriter(log.getAbsolutePath(),
 						log.exists()));
-
-				// rightNow = Calendar.getInstance();
-				// mOut.write(rightNow.get(Calendar.HOUR_OF_DAY)
-				// +": "+rightNow.get(Calendar.MINUTE)+": "
-				// +rightNow.get(Calendar.SECOND)+"\n");
 			} catch (IOException e) {
 				Log.e(TAG, "Exception opening log file", e);
 				LoggerService.this.stopSelf();
@@ -169,34 +122,13 @@ public class LoggerService extends Service {
 
 				try {
 					String outputString = "";
-					// System.out.println("logging: "+ i);
-
-					/*
-					 * //check the brightness int curBrightness; curBrightness =
-					 * android.provider.Settings.System.getInt(
-					 * getContentResolver(),
-					 * android.provider.Settings.System.SCREEN_BRIGHTNESS);
-					 * 
-					 * outputString = outputString.concat( String.format("%d",
-					 * curBrightness));
-					 * 
-					 * //Get battery data
-					 */IntentFilter ifilter = new IntentFilter(
+			
+					 //Get battery data
+					 IntentFilter ifilter = new IntentFilter(
 							Intent.ACTION_BATTERY_CHANGED);
 					Intent batteryStatus = registerReceiver(null, ifilter);
-
-					/*
-					 * // Are we charging / charged? int batStat =
-					 * batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS,
-					 * -1); boolean isCharging = batStat ==
-					 * BatteryManager.BATTERY_STATUS_CHARGING || batStat ==
-					 * BatteryManager.BATTERY_STATUS_FULL;
-					 * 
-					 * // How are we charging? int chargePlug =
-					 * batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED,
-					 * -1);
-					 */// boolean usbCharge = chargePlug == BATTERY_PLUGGED_USB;
-						// boolean acCharge = chargePlug == BATTERY_PLUGGED_AC;
+					
+					// Are we charging / charged? int batStat =
 					int level = batteryStatus.getIntExtra(
 							BatteryManager.EXTRA_LEVEL, -1);
 					int scale = batteryStatus.getIntExtra(
@@ -204,47 +136,7 @@ public class LoggerService extends Service {
 					float currentVoltage = (float) batteryStatus.getIntExtra(
 							"voltage", 0) / 1000;
 					float batteryPct = level / (float) scale;
-					// System.out.println(scale);
-					/*
-					 * //TODO Accelerometer sensAcc =
-					 * sensMan.getSensorList(Sensor.TYPE_ACCELEROMETER);
-					 * //System
-					 * .out.println("Acc "+sensAcc.values[0]+","+sensAcc.
-					 * values[1]+","+sensAcc.values[2]);
-					 */
-					int curr;
-					curr = dvfs.getCPUFrequency();
-
-					/*
-					 * System.out.println("CPU Freq: " + curr);
-					 * System.out.println("Try Step Down");
-					 * dvfs.stepDownFrequency();
-					 * System.out.println("Done Step Down");
-					 */
-
-					// TODO figure out API calls for network sig strength
-					// Get network data signal strengths
-					/*
-					 * outputString = outputString.concat(
-					 * String.format(",%d,%d,%d", mNetInfo.getCdmaSigStrength(),
-					 * mNetInfo.getEvdoSigStrength(),
-					 * mNetInfo.getGsmSigStrength()));
-					 */
-					/*
-					 * outputString = outputString.concat(
-					 * String.format(",%s,%f,%d,%d,%d,%d,%d,%d,%d\n",
-					 * mNetInfo.getCallStatus(), batteryPct, batStat,
-					 * CPUInfo.getCPUUtilizationPct(),
-					 * CPUInfo.getContextSwitches(),
-					 * CPUInfo.getProcessesCreated(),
-					 * CPUInfo.getProcessesRunning(),
-					 * CPUInfo.getProcessesBlocked(), powMan.isScreenOn() ? 1 :
-					 * 0));
-					 */
-					// mMoving ? 1 : 0)); TODO figure out accelerometer and put
-					// this back in
-
-					// TODO ambient light
+				
 					outputString = String.format(
 							//"%d,%d,%d,%d,%f,%f,%d,%d,%d,%d,%d\n", 
 							"%d,%d,%d,%d,%f,%f,%d\n", 
@@ -253,32 +145,19 @@ public class LoggerService extends Service {
 							InteractivityService.mActs.size(),
 							CurrentReaderFactory.getValue() * -1, batteryPct,
 							currentVoltage, 
-							//CPUInfo.getContextSwitches(),
-							//CPUInfo.getProcessesCreated(), 
-							//CPUInfo.getProcessesRunning(), 
-							//CPUInfo.getProcessesBlocked(),
 							powMan.isScreenOn() ? 1 : 0);
 
 					date = new Date();
 					tstamp = new Timestamp(date.getTime());
 					mOut.write(tstamp.toString()+",");
 					
-					//rightNow = Calendar.getInstance();
-					//mOut.write(rightNow.getTime().toString() + ",");
-					
-					// mOut.write(rightNow.get(Calendar.HOUR_OF_DAY)
-					// +": "+rightNow.get(Calendar.MINUTE)+": "
-					// +rightNow.get(Calendar.SECOND)+"\n");	
 					
 					mOut.write(outputString);
 					SystemClock.sleep(500);
 
 				} catch (IOException e) {
 					Log.e(TAG, "Exception appending to log file", e);
-				} /*
-				 * catch (SettingNotFoundException e) { // e.printStackTrace();
-				 * Log.e(TAG, "Brightness setting not found"); }
-				 */
+				}
 			}
 
 			try {
@@ -295,13 +174,6 @@ public class LoggerService extends Service {
 	public void onDestroy() {
 
 		mRunning = false;
-		/*
-		 * try { mOut.close(); } catch (IOException e) {
-		 * 
-		 * }
-		 * 
-		 * stopForeground(true);
-		 */
 	}
 
 	@Override

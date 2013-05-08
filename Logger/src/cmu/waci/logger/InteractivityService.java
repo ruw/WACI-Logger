@@ -3,6 +3,9 @@ package cmu.waci.logger;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import csu.research.AURA.CPUInfo;
+import csu.research.AURA.DVFSControl;
+
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.Service;
@@ -24,6 +27,7 @@ import android.widget.ToggleButton;
 
 public class InteractivityService extends Service {
 	InteractivityView mView;
+	//list of touches, size is the number of touches within window:
 	static LinkedList<Time> mActs;
 	private DVFSControl dvfs;
 	
@@ -41,6 +45,7 @@ public class InteractivityService extends Service {
 	private int nextState = 0;
 	private int currState = 0;
 	private int guessFreq = 0;
+	
 	/*
 	private static int INTER_LOW = 10;
 	private static int INTER_MID = 25;
@@ -57,12 +62,14 @@ public class InteractivityService extends Service {
 	private static double UTIL_MID = 95.0;
 	
 	// Transition Rates For Performance Metric
+	//Gun:
 	/*
 	double[][] perf_t0 = {{.7,.3,0},{.5,.5,0},{0,1,0}};
 	double[][] perf_t1 = {{.12,88,0},{.1,.88,.02},{0,.96,.04}};
 	double[][] perf_t2 = {{0,1,0},{0,.43,.57},{0,.39,.61}};
 	*/
 	
+	//Gun:
 	double[][] perf_t0 = {{.75,.25,0},{.71,.29,0},{0,1,0}};
 	double[][] perf_t1 = {{.27,.73,0},{.21,.71,.08},{0,.99,.01}};
 	double[][] perf_t2 = {{0,1,0},{0,.41,.59},{0,.24,.76}};
@@ -72,13 +79,14 @@ public class InteractivityService extends Service {
  	MDP_3States perf_ns2;
  	
 	// Transition Rates For Power Metric	
+ 	//Marcus:
 	/*
  	double[][] pow_t0 = {{.99,.01,0},{.999,.001,0},{0,1,0}};
  	double[][] pow_t1 = {{.001,.999,0},{.12,.87,.01},{0,.999,.001}};
  	double[][] pow_t2 = {{0,1,0},{0,.67,.33},{0,.1,.9}};	
  	*/
- 	//Gun
  	
+ 	//Gun:
  	double[][] pow_t0 = {{.994,.05,0},{.999,.001,0},{0,1,0}};
  	double[][] pow_t1 = {{.001,.999,0},{.12,.85,.03},{0,.999,.001}};
  	double[][] pow_t2 = {{0,1,0},{0,.999,.001},{0,.44,56}};	
@@ -113,7 +121,6 @@ public class InteractivityService extends Service {
 	
 	public void onCreate() {
 		super.onCreate();
-		//System.out.println("h");
 		mActs = new LinkedList<Time>();
 		mView = new InteractivityView(this);
 		dvfs = new DVFSControl();
@@ -133,9 +140,8 @@ public class InteractivityService extends Service {
 
 		mRunning = true;
 		
-		Notification n = new Notification();
-		startForeground(1111, n);
-
+		
+		//setup touch detection
 		WindowManager.LayoutParams params = new WindowManager.LayoutParams(
 				WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
 				WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
@@ -144,23 +150,15 @@ public class InteractivityService extends Service {
 						| WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
 				PixelFormat.TRANSLUCENT);
 
-		final GestureDetector gestureDetector = new GestureDetector(this,
-				new InteractivityListener());
+	//	final GestureDetector gestureDetector = new GestureDetector(this,
+	//			new InteractivityListener());
 		View.OnTouchListener gestureListener = new View.OnTouchListener() {
+			//Callback for touches, adds the current time to mActs
 			public boolean onTouch(View v, MotionEvent event) {
 				Time t = new Time();
 				t.setToNow();
 				mActs.add(t);
-				 System.out.println("Touch!");
-				// System.out.println(mActs.size());
-
-				long m = mActs.getFirst().toMillis(false);
-				long cur = t.toMillis(true);
-				// System.out.println("true: " + t.toMillis(true) + " false: " +
-				// t.toMillis(false));
-				// System.out.println(cur-m);
-
-				return false;// gestureDetector.onTouchEvent(event);
+				return false;
 			}
 		};
 
@@ -192,24 +190,12 @@ public class InteractivityService extends Service {
 		curOptPerf = false;
 	}
 	
-	/*
-    public void onToggleClicked(View view) {
-        // Is the toggle on?
-        boolean on = ((ToggleButton) view).isChecked();
-        
-        if (on) {
-            // Enable CPU scaling
-        	savePowerOn = true;
-        } else {
-            // Disable CPU scaling
-        	savePowerOn = false;
-        }
-    }
-*/
 	Runnable doWork = new Runnable() {
 		@SuppressWarnings("deprecation")
 		@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 		public void run() {
+			
+			//setup foreground so can be run for long periods
             Notification note=new Notification.Builder(getApplicationContext())
     		.setContentTitle("Optimizing")
     		.setSmallIcon(R.drawable.ic_launcher)
@@ -285,64 +271,19 @@ public class InteractivityService extends Service {
 					SystemClock.sleep(5000);
 				}
             }
-		/*	
-			while (mRunning) {
-				removeOld(30000);
-				if (savePowerOn) {
-					if (mActs.size() < 2)
-						dvfs.setCPUFrequency(freqModes.get(0));
-					else if (mActs.size() < 10)
-						dvfs.setCPUFrequency(freqModes.get(1));
-					else if (mActs.size() < 15)
-						dvfs.setCPUFrequency(freqModes.get(2));
-					else if (mActs.size() < 20)
-						dvfs.setCPUFrequency(freqModes.get(4));
-					else if (mActs.size() < 30)
-						dvfs.setCPUFrequency(freqModes.get(6));
-					else
-						dvfs.setCPUFrequency(freqModes.get(10));
-				}
-				System.out.println("freq: " + dvfs.getCPUFrequency() +
-						 " presses: " + mActs.size());
-				SystemClock.sleep(5000);
-			}
-*/
-			//util
-			/*
-			while(mRunning) {
-				
-				if(savePowerOn){
-					float pctAcc=0;
-					for(int i=0;i<10;i++) {
-						pctAcc+=CPUInfo.getCPUUtilizationPct();
-						SystemClock.sleep(500);
-					}
-					pctAcc /= 10;
-					
-					if(pctAcc<33)	
-						dvfs.setCPUFrequency(freqModes.get(1));
-					else if(pctAcc<66)
-						dvfs.setCPUFrequency(freqModes.get(4));
-					else
-						dvfs.setCPUFrequency(freqModes.get(10));
-				}
-				
-			}
-			*/
+	
 			stopForeground(true);
 			mActs = null;
 			InteractivityService.this.stopSelf();
 		}
 	};
 	
-
+	//removes any times from mActs greater than age
 	private void removeOld(long age) {
 		Time t = new Time();
 		t.setToNow();
 		long cur = t.toMillis(false);
 		while (mActs.peek() != null) {
-			// System.out.println("cur: " + cur + " old: " +
-			// mActs.peek().toMillis(false));
 			if (mActs.peek().toMillis(false) + age < cur) {
 				mActs.remove();
 			} else {
@@ -362,20 +303,6 @@ public class InteractivityService extends Service {
 		public InteractivityView(Context context) {
 			super(context);
 		}
-
-	/*	@Override
-		public boolean onTouchEvent(MotionEvent event) {
-			// return super.onTouchEvent(event);
-			 System.out.println("good2");
-			 System.out.println("good3");
-			Time t = new Time();
-			t.setToNow();
-	//		mActs.add(t);
-	//		System.out.println(mActs.size());
-			//Toast.makeText(getContext(),"onTouchEvent",
-			//		Toast.LENGTH_LONG).show();
-			return false;
-		}*/
 
 	}
 

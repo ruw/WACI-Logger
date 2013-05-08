@@ -30,8 +30,6 @@ public class LoggerActivity extends Activity {
 	private LoggerService mLogger;
 	private InteractivityService mInteract;
 	private boolean mBound, mBound2;
-	private Button startButton;
-	private Button stopButton;
 	private RadioGroup radioOptGroup;
 	private ToggleButton toggleButton;
 	
@@ -48,17 +46,12 @@ public class LoggerActivity extends Activity {
                
         System.out.println("Start Activity!");
         Toast.makeText(this, "Start Activity! ",1).show();
- //       System.out.println(Arrays.toString(CPUInfo.getCPUStats()));
-        
-  //      mLogger.bindService(new Intent(this, 
-  //              LoggerService.class), mConnection, Context.BIND_AUTO_CREATE);
 
     }
     
+    
     private void setupButtons() {
     	radioOptGroup = (RadioGroup)this.findViewById(R.id.optState);
-        //startButton = (Button)this.findViewById(R.id.Start);
-        //stopButton = (Button)this.findViewById(R.id.Stop);
         toggleButton = (ToggleButton)this.findViewById(R.id.toggleButton);
         
         toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -114,54 +107,8 @@ public class LoggerActivity extends Activity {
             }
         });
         
-        /*
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            	//TODO
-            	int selectedId = radioOptGroup.getCheckedRadioButtonId();
-            	if (!started)
-            		startLogging();
-            	if(selectedId == R.id.optPerf) {  	
-            		InteractivityService.startOptPerf();
-            		System.out.println("perf");
-            	}
-            	else if(selectedId == R.id.optPow) {
-            		InteractivityService.startOptPow();
-            		System.out.println("pow");
-            	}
-            	
-            }
-        });
-        stopButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            	//TODO
-            	InteractivityService.stopOptPerf();
-            	InteractivityService.stopOptPow();
-            	stopLogging();
-            }
-        }); 
-        */     
     }
     
-    /*
-    public void onToggleClicked(View view) {
-        // Is the toggle on?
-        boolean on = ((ToggleButton) view).isChecked();
-        
-        if (on) {
-            // Enable CPU scaling
-        	Toast.makeText(this.getApplicationContext(), "Toggle TURN ON! ",1).show();
-        	//mInteract.savePowerOn = true;
-        } else {
-            // Disable CPU scaling
-        	Toast.makeText(this.getApplicationContext(), "Toggle TURN OFF! ",1).show();
-        	//mInteract.savePowerOn = false;
-        }
-    }
-
-*/
 
     private void startLogging() {
     	started = true;
@@ -187,31 +134,10 @@ public class LoggerActivity extends Activity {
         }   	
     }
 
-    /*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.logger, menu);       
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.logger, menu);
-        return true;
-    }
-    
-    public boolean onOptionsItemSelected(MenuItem item) {
-    	switch (item.getItemId()) 
-    	{
-    		case R.id.action_settings:
-    			return true;
-    		default:
-    			return super.onOptionsItemSelected(item);
-    	}
-    }
-    */
     
     @Override
     protected void onStart() {
         super.onStart();
-        // Bind to LocalService
 
     }
 

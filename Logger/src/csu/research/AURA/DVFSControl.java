@@ -1,5 +1,5 @@
-package cmu.waci.logger;
-
+package csu.research.AURA;
+//Author: Brad Kyoshi Donohoo
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
