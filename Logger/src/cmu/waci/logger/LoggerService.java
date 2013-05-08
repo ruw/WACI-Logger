@@ -141,9 +141,15 @@ public class LoggerService extends Service {
 			}
 			// System.out.println(getExternalFilesDir(null));
 			System.out.println("Write to log.");
-			File log = new File(getExternalFilesDir(null), "log.txt");
-			log.delete();
-			log = new File(getExternalFilesDir(null), "log.txt");
+			
+			Calendar now = Calendar.getInstance();
+			String log_n;
+			log_n = (now.get(Calendar.MONTH)+1)+"_"+(now.get(Calendar.DAY_OF_MONTH)+1)+"_"+
+				now.get(Calendar.HOUR_OF_DAY)+"_"+now.get(Calendar.MINUTE)+"_"+
+				now.get(Calendar.SECOND)+".txt";
+			File log = new File(getExternalFilesDir(null), log_n);
+			//log.delete();
+			//log = new File(getExternalFilesDir(null), "log.txt");
 
 			mOut = null;
 			try {

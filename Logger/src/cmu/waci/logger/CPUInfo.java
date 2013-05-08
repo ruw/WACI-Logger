@@ -86,7 +86,7 @@ public class CPUInfo {
                             temp6 = mStealTime + mGuestTime;
                             mStealTime = Integer.parseInt(buf[7]);
                             mGuestTime = Integer.parseInt(buf[8]);
-                            /*
+                            
                             total = mNormalUserProcessTime
                                     + mNicedUserProcessTime + mSystemProcessTime
                                     + mIdleProcessTime + mIoWaitTime + mIrqTime
@@ -94,32 +94,39 @@ public class CPUInfo {
                             totalDiff = total
                                     - (temp + temp1 + temp2 + temp3 + temp4 
                                     + temp5 + temp6);
-                            */
+                            
+                            /*
                             total = mNormalUserProcessTime
                                     + mNicedUserProcessTime + mSystemProcessTime
                                     + mIdleProcessTime + mIoWaitTime;
                             totalDiff = total
                                     - (temp + temp1 + temp2 + temp3 + temp4);
-                            mIdlePct = ((mIdleProcessTime - temp3) * 100)
-                                    / totalDiff;
-                            mSystemPct = ((mSystemProcessTime - temp2) * 100)
-                                    / totalDiff;
-                            mUserPct = (((mNormalUserProcessTime
-                                    + mNicedUserProcessTime)
-                                            - (temp + temp1))
-                                                    * 100)
-                                                            / totalDiff;
-                            mIrqPct = (((mIrqTime + mSoftIRQTime) - temp5) * 100)
-                                    / totalDiff;
-                            mIoWaitPct = ((mIoWaitTime - temp4) * 100)
-                                    / totalDiff;
-                            mTotalPct = (((mNormalUserProcessTime
-                                    + mNicedUserProcessTime)
-                                            - (temp + temp1))
-                                                    + (mSystemProcessTime
-                                                            - temp2)
-                                                                    * 100)
-                                                                            / totalDiff;
+                            */
+                            if (totalDiff!=0) {
+                            	mIdlePct = ((mIdleProcessTime - temp3) * 100)
+                            		/ totalDiff;
+                            	mSystemPct = ((mSystemProcessTime - temp2) * 100)
+                                        / totalDiff;
+                                mUserPct = (((mNormalUserProcessTime
+                                        + mNicedUserProcessTime)
+                                                - (temp + temp1))
+                                                        * 100)
+                                                                / totalDiff;
+                                mIrqPct = (((mIrqTime + mSoftIRQTime) - temp5) * 100)
+                                        / totalDiff;
+                                mIoWaitPct = ((mIoWaitTime - temp4) * 100)
+                                        / totalDiff;
+                                mTotalPct = (((mNormalUserProcessTime
+                                        + mNicedUserProcessTime)
+                                                - (temp + temp1))
+                                                        + (mSystemProcessTime
+                                                                - temp2)
+                                                                        * 100)
+                                                                                / totalDiff;
+                            } else {
+                            	System.out.println("ERR: mIdlePct / 0");
+                            }
+                            
                         }
                     } else if (line.startsWith("ctxt")) {
                         buf = line.replaceAll("ctxt ", "").trim().split(" ");

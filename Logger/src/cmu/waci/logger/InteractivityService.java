@@ -41,19 +41,49 @@ public class InteractivityService extends Service {
 	private int nextState = 0;
 	private int currState = 0;
 	private int guessFreq = 0;
+	/*
+	private static int INTER_LOW = 10;
+	private static int INTER_MID = 25;
+	
+	private static double UTIL_LOW = 30.0;
+	private static double UTIL_MID = 70.0;
+	*/
+	//Gun
+	
+	private static int INTER_LOW = 10;
+	private static int INTER_MID = 25;
+	
+	private static double UTIL_LOW = 75.0;
+	private static double UTIL_MID = 95.0;
 	
 	// Transition Rates For Performance Metric
+	/*
 	double[][] perf_t0 = {{.7,.3,0},{.5,.5,0},{0,1,0}};
 	double[][] perf_t1 = {{.12,88,0},{.1,.88,.02},{0,.96,.04}};
 	double[][] perf_t2 = {{0,1,0},{0,.43,.57},{0,.39,.61}};
+	*/
+	
+	double[][] perf_t0 = {{.75,.25,0},{.71,.29,0},{0,1,0}};
+	double[][] perf_t1 = {{.27,.73,0},{.21,.71,.08},{0,.99,.01}};
+	double[][] perf_t2 = {{0,1,0},{0,.41,.59},{0,.24,.76}};
+	
  	MDP_3States perf_ns0;
  	MDP_3States perf_ns1;  	
  	MDP_3States perf_ns2;
  	
 	// Transition Rates For Power Metric	
-	double[][] pow_t0 = {{.99,.01,0},{.999,.001,0},{0,1,0}};
+	/*
+ 	double[][] pow_t0 = {{.99,.01,0},{.999,.001,0},{0,1,0}};
  	double[][] pow_t1 = {{.001,.999,0},{.12,.87,.01},{0,.999,.001}};
- 	double[][] pow_t2 = {{0,1,0},{0,.67,.33},{0,.1,.9}};
+ 	double[][] pow_t2 = {{0,1,0},{0,.67,.33},{0,.1,.9}};	
+ 	*/
+ 	//Gun
+ 	
+ 	double[][] pow_t0 = {{.994,.05,0},{.999,.001,0},{0,1,0}};
+ 	double[][] pow_t1 = {{.001,.999,0},{.12,.85,.03},{0,.999,.001}};
+ 	double[][] pow_t2 = {{0,1,0},{0,.999,.001},{0,.44,56}};	
+ 	
+ 	
  	MDP_3States pow_ns0;
  	MDP_3States pow_ns1;  	
  	MDP_3States pow_ns2;
@@ -197,9 +227,9 @@ public class InteractivityService extends Service {
             		
             		addInter(mActs.size());
             		double interAvg = getAvg(interRecord);
-            		if (interAvg <= 10) {
+            		if (interAvg <= INTER_LOW) {
             			nextState = 0;
-            		} else if (interAvg <= 25) {
+            		} else if (interAvg <= INTER_MID) {
             			nextState = 1;
             		} else {
             			nextState = 2;
@@ -211,9 +241,9 @@ public class InteractivityService extends Service {
             		
             		addUtil(CPUInfo.getCPUUtilizationPct());
             		double utilAvg = getAvg(utilRecord);
-            		if (utilAvg <= 0.3) {
+            		if (utilAvg <= UTIL_LOW) {
             			nextState = 0;
-            		} else if (utilAvg <=0.7) {
+            		} else if (utilAvg <= UTIL_MID) {
             			nextState = 1;
             		} else {
             			nextState = 2;
