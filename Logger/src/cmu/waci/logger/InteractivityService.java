@@ -206,6 +206,7 @@ public class InteractivityService extends Service {
             while (mRunning) {
             	removeOld(15000);
             	// Depending on optimization selection
+            	// Set next states of power or performance options
             	if (curOptPow) {
             		p_ns0 = pow_ns0;
             		p_ns1 = pow_ns1;

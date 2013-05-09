@@ -2,6 +2,12 @@ package cmu.waci.logger;
 
 import java.util.ArrayList;
 
+/* 
+ * This is the Markov Decision Process Model
+ * Takes in transition probabilities and state values.
+ * It will store the state and returns current state and state values.
+ */
+
 public class MDP_3States {
 	private int CurrState = 0;
 	
@@ -19,6 +25,7 @@ public class MDP_3States {
 		freq = inFreq;
 	}
 	
+	// Does the transition randomly based on given probabilities
 	public void doRun() {
 		double prob = Math.random();
 		int nextState = CurrState;
@@ -37,10 +44,12 @@ public class MDP_3States {
         return CurrState;
     }
 	
+	// Sets current state
 	public void setCurrState(int curr) {
         CurrState = curr;
     }
 	
+	// Get attribute i.e. frequency associated with a state
 	public int getFreq() {
 		return freq[CurrState];
 	}

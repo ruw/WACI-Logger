@@ -90,7 +90,7 @@ public class LoggerActivity extends Activity {
         radioOptGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            	//TODO
+            	
             	int selectedId = radioOptGroup.getCheckedRadioButtonId();
             	if(selectedId == R.id.optPerf) {  
             		System.out.println("Selected Performance");
