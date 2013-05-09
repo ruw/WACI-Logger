@@ -1,4 +1,4 @@
-To build this project, the Android Developer Tools must be installed. It can be
+﻿To build this project, the Android Developer Tools must be installed. It can be
 added as a project to the Android-specific Eclipse.
 
 Once installed on an Anddroid phone, the logger can be run by selecting
@@ -19,4 +19,3 @@ The main relevant files are as follows:
 	InteractivityService.java: Service to detect the user touches. The performance
 														 and power optimizations are also performed here
 	MDP_3States.java: Class to manage the state transitions for markov
-	
